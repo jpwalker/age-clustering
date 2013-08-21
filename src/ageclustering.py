@@ -71,11 +71,11 @@ def calc_bias(xi_cross_filename, xi_m_m, xi_auto_halos, mass_i, age_i, bias_dire
 if __name__ == "__main__":
     h = 0.73
     massconv = 6.885e6 / h
-    num_mass_bins = 4
+    num_mass_bins = 12
     num_age_bins = 5
     agekey = 'form'
     #Read in data from age files
-    indirec = '/home/jpwalker/Desktop/z0_attempt6/'
+    indirec = '/Users/jpwalker/Desktop/z0_attempt1/'
     infile = 'millenniumIIsnap67age_attempt1057fof_mod.txt'
     halos = read_halo_table_ascii(indirec + infile, fmt = 'x,x,x,x,x,x,6,7,8,9,x,x,x,17,x,21,22,23')
     halos_filename = '{0}halo_table_{1}'.format(indirec, infile)
@@ -85,7 +85,8 @@ if __name__ == "__main__":
     #Create directories for output
     (halo_table_outdirec, xi_auto_outdirec, xi_cross_outdirec, bias_direc) = create_folders(indirec)
     #Mass Selection masses in number of particles
-    massbins = [13071, 15977, 101670, 188816, 1016702, 2904865, 2904865, 726216412491]
+    massbins = [1056, 1885, 1886, 3352, 3353, 5962, 5963, 10602, 10603, 18854, 18855, 33528, 33529, 59623, \
+                59624, 106027, 106028, 188546, 188547, 335288, 335289, 596236, 596237, 80000000000]
     massbin = [1, 0]
     #Prepare lists to store results
     mass_selected_halos = [] #Stores halo tables for mass selected sets
