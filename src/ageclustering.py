@@ -75,8 +75,8 @@ if __name__ == "__main__":
     num_age_bins = 5
     agekey = 'form'
     #Read in data from age files
-    indirec = '/Users/jpwalker/Desktop/z0_attempt1/'
-    infile = 'millenniumIIsnap67age_attempt1057fof_mod.txt'
+    indirec = '/home/jpwalker/Desktop/z0_attempt1_form/'
+    infile = 'millenniumIIsnap67age_attempt1057fof.txt'
     halos = read_halo_table_ascii(indirec + infile, fmt = 'x,x,x,x,x,x,6,7,8,9,x,x,x,17,x,21,22,23')
     halos_filename = '{0}halo_table_{1}'.format(indirec, infile)
     xi_halos = '{0}xi_{1}'.format(indirec, infile)
@@ -90,12 +90,15 @@ if __name__ == "__main__":
     massbin = [1, 0]
     #Prepare lists to store results
     mass_selected_halos = [] #Stores halo tables for mass selected sets
+    mass_selected_halos_xi_auto = []
+    mass_selected_halos_xi_cross = []
     age_selected_halos = [] #Stores halo tables for mass-age selected sets
     age_selected_halos_xi_auto = [] #Stores the 2pt-autocorr for the age_selected_halos tables
     age_selected_halos_xi_cross = [] #Stores the 2pt-crosscorr for the age_selected halos and all halos table
     testnum = 0
     out = open('{0}properties.dat'.format(indirec), 'w')
-    out.write('mass_i    age_i    num    min_mass    max_mass    age_key    min_age    max_age\n')
+    out.write('mass_i    age_i    num    min_mass    median_mass    average_mass    max_mass    age_key    \
+    min_age    median_age    average_age    max_age\n')
     for mass_i in range(1, num_mass_bins + 1):
         massbin = [massbins[(mass_i - 1) * 2], massbins[(mass_i - 1) * 2 + 1]]
         #massbin[1] = scoreatpercentile(get_col_halo_table(halos, 'fof_np'), mass_i * 100. / num_mass_bins)
@@ -103,6 +106,14 @@ if __name__ == "__main__":
             massbin[1] += 1
         currmass_select_halo = mass_sub_select(halos, massbin[0], massbin[1])
         mass_selected_halos.append(currmass_select_halo)
+        halo_table_filename = '{0}halo_table_{1}.dat'.format(halo_table_outdirec, mass_i)
+        write_halo_table_ascii(halo_table_filename, currmass_select_halo, \
+                                   fmt = '0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20')
+        print 'Calculating autocorrelation function for mass selected sample.'
+        xi_auto_filename = '{0}xi_{1}.dat'.format(xi_auto_outdirec, mass_i)
+        xi_cross_filename = '{0}xi_{1}.dat'.format(xi_cross_outdirec, mass_i)
+        check_output(['2pt-autocorrelation', halo_table_filename, xi_auto_filename])
+        check_output(['2pt-crosscorrelation', halo_table_filename, halos_filename, xi_cross_filename])        
         print '{0} halos with {1} <= M < {2} M_Sun'.format(currmass_select_halo['length'], \
                                                            log10(massbin[0] * massconv), \
                                                            log10(massbin[1] * massconv))
@@ -122,8 +133,12 @@ if __name__ == "__main__":
             age_selected_halos.append(currage_select_halo)
             out.write('{0}\n'.format('    '.join([str(mass_i), str(age_i), str(currage_select_halo['length']), \
                                    str(min(get_col_halo_table(currage_select_halo, 'fof_np'))), \
+                                   str(np.median(get_col_halo_table(currage_select_halo, 'fof_np'))), \
+                                   str(np.average(get_col_halo_table(currage_select_halo, 'fof_np'))), \
                                    str(max(get_col_halo_table(currage_select_halo, 'fof_np'))), \
                                    agekey, str(min(get_col_halo_table(currage_select_halo, agekey))), \
+                                   str(np.median(get_col_halo_table(currage_select_halo, agekey))), \
+                                   str(np.average(get_col_halo_table(currage_select_halo, agekey))), \
                                    str(max(get_col_halo_table(currage_select_halo, agekey)))])))
             print '{0} halos in age bin.'.format(currage_select_halo['length'])
             #Saving halo table to file

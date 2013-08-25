@@ -30,19 +30,8 @@ def get_bin_mean(data, b_start, b_end):
     else:
         return (None, idx)
 
-if __name__ == '__main__':
-    direc = '/home/jpwalker/Desktop/z0_attempt1/'
-    infile = 'millenniumIIsnap67age_attempt1057fof.txt'
-    age_key = 'merg'
-    h = 0.73
-    massconv = 6.885e6 #Mass conversion reports mass in M_sun/h
-    #Read in all halos
-    halos = read_halo_table_ascii('{0}{1}'.format(direc, infile), \
-                                  fmt = 'x,x,x,x,x,x,x,x,x,x,x,x,x,17,x,21,22,23')
-    fof_np = np.array(get_col_halo_table(halos, 'fof_np')) * massconv
-    form = np.array(get_col_halo_table(halos, age_key))
-    #plt.semilogx(fof_np, form, 'k.')
-    lims = 10. ** np.linspace(9, 15, (15.25-9) / .25)
+def plot_age(form, fof_np):
+    lims = 10. ** np.linspace(9, 15, (15.25-9) / .25) #These are the limits for the mass bins
     (avg, med) = binning(fof_np, form, lims)
     plt.semilogx(avg[0], avg[1], '+b', subsx = [2, 3, 4, 5, 6, 7, 8, 9], label = 'Average')
     plt.semilogx(med[0], med[1], 'b', linestyle = 'dashed', label = 'Median')
@@ -74,4 +63,56 @@ if __name__ == '__main__':
     y2.set_yticklabels(yl)
     y2.set_ylabel('z + 1')
     
+    plt.show()
+    
+def plot_redshift(redshifts, fof_np):
+    lims = 10. ** np.linspace(9, 15, (15.25-9) / .25)
+    (avg, med) = binning(fof_np, redshifts, lims)
+    plt.semilogx(avg[0], avg[1], '+b', subsx = [2, 3, 4, 5, 6, 7, 8, 9], label = 'Average')
+    #plt.semilogx(med[0], med[1], 'b', linestyle = 'dashed', label = 'Median')
+    MS = 2.89 * (avg[0] / 10. ** 10.) ** -0.0563
+    plt.semilogx(avg[0], MS, 'r', label = 'MS Curve')
+    plt.legend()
+    plt.xlabel('M [M_sun / h]')
+    plt.ylabel('z + 1')
+    
+    ##Create Second x axis
+    xlims = plt.xlim()
+    x2 = plt.twiny()
+    x2.set_xscale('log')
+    x2.set_xlim((xlims[0] / .73, xlims[1] / .73))
+    x2.set_xlabel('M [M_sun]')
+    
+    ##Create second y axis
+    ylims = plt.ylim()
+    yt = plt.yticks()[0]
+    y2 = plt.twinx()
+    y2.set_ylim(ylims)
+    y2.set_yticks(yt)
+    yl = []
+    for j in yt:
+        yl.append('{:5.2f}'.format(13.5795 - mth.asinh((j / 1.4424957031) ** (-3. / 2.)) / 0.0969815))
+    y2.set_yticklabels(yl)
+    y2.set_ylabel('Lookbacktime')
+    
+    plt.show()    
+
+if __name__ == '__main__':
+    direc = '/home/jpwalker/Desktop/z0_attempt1_merg/'
+    infile = 'millenniumIIsnap67age_attempt1057fof_mod.txt'
+    age_key = 'merg'
+    h = 0.73
+    massconv = 6.885e6 #Mass conversion reports mass in M_sun/h
+    #Read in all halos
+    halos = read_halo_table_ascii('{0}{1}'.format(direc, infile), \
+                                  fmt = 'x,x,x,x,x,x,x,x,x,x,x,x,x,17,x,21,22,23')
+    fof_np = np.array(get_col_halo_table(halos, 'fof_np')) * massconv
+    form = np.array(get_col_halo_table(halos, age_key)) 
+    redshifts = 1.44224957031 * np.sinh(0.0969815 * (13.5795 - form)) ** (-2. / 3.)
+    #plt.semilogx(fof_np, form, 'k.')
+    plot_age(form, fof_np)
+    plot_redshift(redshifts, fof_np)
+    plt.hist(form, bins = 20)
+    plt.show()
+    plt.hist(redshifts, bins = 20)
     plt.show()
