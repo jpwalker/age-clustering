@@ -62,11 +62,11 @@ def preperations(halos_filename, xi_halos, halos):
     xi_m_m = readfile('{0}xi_m_m.txt'.format(indirec), col = 2, delim = ' ')
     return (xi_auto_halos, xi_m_m)
 
-def calc_bias(xi_cross_filename, xi_m_m, xi_auto_halos, mass_i, age_i, bias_direc):
+def calc_bias(xi_cross_filename, xi_m_m, xi_auto_halos, bias_filename):
     age_selected_halos_xi_cross = readfile(xi_cross_filename, col = 3, delim = ',', skip = 2)
     bias = np.array([age_selected_halos_xi_cross[0], age_selected_halos_xi_cross[1] / np.sqrt(xi_m_m[1] * \
                                                                                               xi_auto_halos[1])])
-    writefile('{0}bias_{1}_{2}'.format(bias_direc, mass_i, age_i), bias, delim = ',',  note = 'radii, bias')
+    writefile(bias_filename, bias, delim = ',',  note = 'radii, bias')
 
 if __name__ == "__main__":
     h = 0.73
@@ -113,7 +113,8 @@ if __name__ == "__main__":
         xi_auto_filename = '{0}xi_{1}.dat'.format(xi_auto_outdirec, mass_i)
         xi_cross_filename = '{0}xi_{1}.dat'.format(xi_cross_outdirec, mass_i)
         check_output(['2pt-autocorrelation', halo_table_filename, xi_auto_filename])
-        check_output(['2pt-crosscorrelation', halo_table_filename, halos_filename, xi_cross_filename])        
+        check_output(['2pt-crosscorrelation', halo_table_filename, halos_filename, xi_cross_filename])
+        calc_bias(xi_cross_filename, xi_m_m, xi_auto_halos, '{0}bias_{1}'.format(bias_direc, mass_i))    
         print '{0} halos with {1} <= M < {2} M_Sun'.format(currmass_select_halo['length'], \
                                                            log10(massbin[0] * massconv), \
                                                            log10(massbin[1] * massconv))
@@ -149,7 +150,7 @@ if __name__ == "__main__":
             xi_cross_filename = '{0}xi_{1}_{2}.dat'.format(xi_cross_outdirec, mass_i, age_i)
             check_output(['2pt-autocorrelation', halo_table_filename, xi_auto_filename])
             check_output(['2pt-crosscorrelation', halo_table_filename, halos_filename, xi_cross_filename])
-            calc_bias(xi_cross_filename, xi_m_m, xi_auto_halos, mass_i, age_i, bias_direc)
+            calc_bias(xi_cross_filename, xi_m_m, xi_auto_halos, '{0}bias_{1}_{2}'.format(bias_direc, mass_i, age_i))
             testnum += currage_select_halo['length']
             agebin[0] = agebin[1]
         massbin[0] = massbin[1]
