@@ -71,11 +71,11 @@ def calc_bias(xi_cross_filename, xi_m_m, xi_auto_halos, bias_filename):
 if __name__ == "__main__":
     h = 0.73
     massconv = 6.885e6 / h
-    num_mass_bins = 12
+    num_mass_bins = 7
     num_age_bins = 5
     agekey = 'form'
     #Read in data from age files
-    indirec = '/home/jpwalker/Desktop/z0_attempt1_form/'
+    indirec = '/Users/jpwalker/Desktop/z0_attempt1_form/'
     infile = 'millenniumIIsnap67age_attempt1057fof.txt'
     halos = read_halo_table_ascii(indirec + infile, fmt = 'x,x,x,x,x,x,6,7,8,9,x,x,x,17,x,21,22,23')
     halos_filename = '{0}halo_table_{1}'.format(indirec, infile)
@@ -85,8 +85,7 @@ if __name__ == "__main__":
     #Create directories for output
     (halo_table_outdirec, xi_auto_outdirec, xi_cross_outdirec, bias_direc) = create_folders(indirec)
     #Mass Selection masses in number of particles
-    massbins = [1056, 1885, 1886, 3352, 3353, 5962, 5963, 10602, 10603, 18854, 18855, 33528, 33529, 59623, \
-                59624, 106027, 106028, 188546, 188547, 335288, 335289, 596236, 596237, 80000000000]
+    massbins = [1056, 1885, 1886, 3352, 3353, 5962, 5963, 10602, 10603, 33528, 33529, 106027, 106028, 80000000000]
     massbin = [1, 0]
     #Prepare lists to store results
     mass_selected_halos = [] #Stores halo tables for mass selected sets
@@ -112,8 +111,8 @@ if __name__ == "__main__":
         print 'Calculating autocorrelation function for mass selected sample.'
         xi_auto_filename = '{0}xi_{1}.dat'.format(xi_auto_outdirec, mass_i)
         xi_cross_filename = '{0}xi_{1}.dat'.format(xi_cross_outdirec, mass_i)
-        check_output(['2pt-autocorrelation', halo_table_filename, xi_auto_filename])
-        check_output(['2pt-crosscorrelation', halo_table_filename, halos_filename, xi_cross_filename])
+        check_output(['/Users/jpwalker/bin/2pt-autocorrelation', halo_table_filename, xi_auto_filename])
+        check_output(['/Users/jpwalker/bin/2pt-crosscorrelation', halo_table_filename, halos_filename, xi_cross_filename])
         calc_bias(xi_cross_filename, xi_m_m, xi_auto_halos, '{0}bias_{1}'.format(bias_direc, mass_i))    
         print '{0} halos with {1} <= M < {2} M_Sun'.format(currmass_select_halo['length'], \
                                                            log10(massbin[0] * massconv), \
