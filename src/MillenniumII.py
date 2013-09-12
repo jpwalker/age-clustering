@@ -123,8 +123,8 @@ def parse_fmt(fmt):
     #Test to see of all numbers were in string
     num_total_col = len(fmt)
     empty_col_num = fmt.count('x')
-    test = [0] * 24
-    for i in range(24): test[i] = fmt.count(str(i))
+    test = [0] * 30
+    for i in range(30): test[i] = fmt.count(str(i))
     if num_total_col != empty_col_num + sum(test):
         raise ValueError('Error check fmt string.')
     return fmt
@@ -132,7 +132,8 @@ def parse_fmt(fmt):
 def cast(d, type):
     try:
         if type == 0 or type == 1 or type == 2 or type == 3 or type == 4 or type == 5  or type == 6 or \
-        type == 10 or type == 15 or type == 16 or type == 17 or type == 20:
+        type == 10 or type == 15 or type == 16 or type == 17 or type == 20 or type == 21 or type == 22 \
+        or type == 23 or type == 24:
             return int(d)
         else:
             return float(d)

@@ -5,23 +5,25 @@ Created on Mar 24, 2013
 '''
 
 import collections
-from random import shuffle
-from random import sample
 halo = collections.namedtuple('halo', ['haloid', 'subhaloid', 'treeid', 'descendantid', 'lastprogenitorid', \
                                        'snapnum', 'sub_np', 'x', 'y', 'z', 'firsthaloinfofgroupid', 'radii', \
                                        'vdisp', 'vmax', 'vmaxrad', 'fofid', 'firstsubhaloid', 'fof_np', 'm200', \
-                                       'r200', 'nsubs', 'form', 'assem', 'merg'])
+                                       'r200', 'nsubs', 'max_tree_mass', 'max_tree_mass_snap', 'min_mass_root_max', \
+                                       'min_mass_root_max_snap', 'form_gao', 'assem_gao', 'form_jp', 'assem_jp', 'merg'])
 keys = {'haloid': 0, 'subhaloid': 1, 'treeid': 2, 'descendantid': 3, 'lastprogenitorid': 4, 'snapnum': 5, \
         'sub_np': 6, 'x': 7, 'y': 8, 'z': 9, 'firsthaloinfofgroupid': 10, 'radii': 11, 'vdisp': 12, \
         'vmax': 13, 'vmaxrad': 14, 'fofid': 15, 'firstsubhaloid': 16, 'fof_np': 17, 'm200': 18, \
-        'r200': 19, 'nsubs': 20, 'form': 21, 'assem': 22, 'merg':23}
+        'r200': 19, 'nsubs': 20, 'max_tree_mass': 21, 'max_tree_mass_snap': 22, 'min_mass_root_max': 23, \
+        'min_mass_root_max_snap': 24, 'form_gao': 25, 'assem_gao': 26, 'form_jp': 27, 'assem_jp': 28, 'merg': 29}
 keys_rev = {0: 'haloid', 1: 'subhaloid', 2: 'treeid', 3: 'descendantid', 4: 'lastprogenitorid', 5: 'snapnum', \
         6: 'sub_np', 7: 'x', 8: 'y', 9: 'z', 10: 'firsthaloinfofgroupid', 11: 'radii', 12: 'vdisp', \
         13: 'vmax', 14: 'vmaxrad', 15: 'fofid', 16: 'firstsubhaloid', 17: 'fof_np', 18: 'm200', \
-        19: 'r200', 20: 'nsubs', 21: 'form', 22: 'assem', 23: 'merg'}
+        19: 'r200', 20: 'nsubs', 21: 'max_tree_mass', 22: 'max_tree_mass_snap', 23: 'min_mass_root_max', \
+        24: 'min_mass_root_max_snap', 25: 'form_gao', 26: 'assem_gao', 27: 'form_jp', 28: 'assem_jp', 29: 'merg'}
 
 def create_halo(haloid, sub, tree, desc, last, snap, s_np, x, y, z, firsthalo, radii, vdisp, \
-                vmax, vmaxrad, fof, firstsub, f_np, m200, r200, nsubs, form, assem, merg):
+                vmax, vmaxrad, fof, firstsub, f_np, m200, r200, nsubs, max_tree_mass, max_tree_mass_snap, \
+                min_mass_root_max, min_mass_root_max_snap, form_gao, assem_gao, form_jp, assem_jp, merg):
     haloid = int(haloid)
     sub = int(sub)
     tree = int(tree)
@@ -43,25 +45,22 @@ def create_halo(haloid, sub, tree, desc, last, snap, s_np, x, y, z, firsthalo, r
     m200 = float(m200)
     r200 = float(r200)
     nsubs = int(nsubs)
-    form = float(form)
-    assem = float(assem)
+    max_tree_mass = int(max_tree_mass)
+    max_tree_mass_snap = int(max_tree_mass_snap)
+    min_mass_root_max = int(min_mass_root_max)
+    min_mass_root_max_snap = int(min_mass_root_max_snap)
+    form_gao = float(form_gao)
+    assem_gao = float(assem_gao)
+    form_jp = float(form_jp)
+    assem_jp = float(assem_jp)
     merg = float(merg)
     a = halo(haloid, sub, tree, desc, last, snap, s_np, x, y, z, firsthalo, radii, vdisp, vmax, \
-             vmaxrad, fof, firstsub, f_np, m200, r200, nsubs, form, assem, merg)
+             vmaxrad, fof, firstsub, f_np, m200, r200, nsubs, max_tree_mass, max_tree_mass_snap, \
+                min_mass_root_max, min_mass_root_max_snap, form_gao, assem_gao, form_jp, assem_jp, merg)
     return a
     
 def create_halo_table():
     return dict(data = [], length = 0)
-
-def shuffle_table(table):
-    shuffle(table['data'])
-    return table
-
-def sample_table(table, num):
-    ret = create_halo_table()
-    ret['data'] = sample(table['data'], num)
-    ret['length'] = num
-    return ret
 
 def halo_table_append(table, h):
     try:
@@ -124,23 +123,24 @@ def parse_fmt(fmt):
     #Test to see of all numbers were in string
     num_total_col = len(fmt)
     empty_col_num = fmt.count('x')
-    test = [0] * 24
-    for i in range(24): test[i] = fmt.count(str(i))
+    test = [0] * 30
+    for i in range(30): test[i] = fmt.count(str(i))
     if num_total_col != empty_col_num + sum(test):
         raise ValueError('Error check fmt string.')
     return fmt
 
-def fmt_cast(d, t):
+def cast(d, type):
     try:
-        if t == 0 or t == 1 or t == 2 or t == 3 or t == 4 or t == 5  or t == 6 or \
-        t == 10 or t == 15 or t == 16 or t == 17 or t == 20:
+        if type == 0 or type == 1 or type == 2 or type == 3 or type == 4 or type == 5  or type == 6 or \
+        type == 10 or type == 15 or type == 16 or type == 17 or type == 20 or type == 21 or type == 22 \
+        or type == 23 or type == 24:
             return int(d)
         else:
             return float(d)
     except ValueError:
         print('Unable to cast {0}'.format(d))
 
-def read_halo_table_ascii(filename, fmt = '0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23', skip = 0):
+def read_halo_table_ascii(filename, fmt = '0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29'):
     h_tab = create_halo_table()
     counter = 0
     line = 0
@@ -150,13 +150,9 @@ def read_halo_table_ascii(filename, fmt = '0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
     rfmt = range(lfmt)
     #Open File
     f = open(filename, 'r')
-    #skip lines
-    for i in range(skip):
-        data = f.readline()
-        print 'Skipping line {0}'.format(i)
     test = True
     #Create new parameters variable for use later
-    parameters = list(0 for i in range(24))
+    parameters = list(0 for i in range(30))
     while test:
         data = f.readline()
         if data != '':
@@ -173,7 +169,7 @@ def read_halo_table_ascii(filename, fmt = '0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
                     for i in rfmt:
                         if fmt[i] != 'x':
                             t_fmt = int(fmt[i])
-                            parameters[t_fmt] = fmt_cast(data[i],t_fmt)
+                            parameters[t_fmt] = cast(data[i],t_fmt)
                 except:
                     print('Unable to convert Line {0}, property {1}.'.format(line, keys_rev[t_fmt]))
                     counter -= 1
@@ -182,7 +178,9 @@ def read_halo_table_ascii(filename, fmt = '0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
                                                      parameters[8], parameters[9], parameters[10], parameters[11], \
                                                      parameters[12], parameters[13], parameters[14], parameters[15], \
                                                      parameters[16], parameters[17], parameters[18], parameters[19], \
-                                                     parameters[20], parameters[21], parameters[22], parameters[23]))
+                                                     parameters[20], parameters[21], parameters[22], parameters[23], \
+                                                     parameters[24], parameters[25], parameters[26], parameters[27], \
+                                                     parameters[28], parameters[29]))
         else: test = not test
     f.close()
     print('{0} valid lines read out of {1} lines.'.format(counter, line))
@@ -196,7 +194,7 @@ def header(f, fmt):
     out = '{0}\n'.format(', '.join(out))
     f.writelines(out)
 
-def write_halo_table_ascii(filename, table, fmt = '0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23'):
+def write_halo_table_ascii(filename, table, fmt = '0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29'):
     fmt = parse_fmt(fmt)
     output = []
     delim = ', '
@@ -218,6 +216,6 @@ def write_halo_table_ascii(filename, table, fmt = '0,1,2,3,4,5,6,7,8,9,10,11,12,
 
 if __name__ == '__main__':
     import cProfile
-    cProfile.run('a = read_halo_table_ascii("/Volumes/DATA/Millennium Data/MillenniumII/snap15.txt", "0,1,2,3,4,5,6,7,8,9,x,x,x,x,x,15,16,17,x,x,20")')
+    #cProfile.run('a = read_halo_table_ascii("/Volumes/DATA/Millennium Data/MillenniumII/snap15.txt", "0,1,2,3,4,5,6,7,8,9,x,x,x,x,x,15,16,17,x,x,20")')
     a = read_halo_table_ascii("/Volumes/DATA/Millennium Data/MillenniumII/snap5.txt", "0,1,2,3,4,5,6,7,8,9,x,x,x,x,x,15,16,17,x,x,20")
     write_halo_table_ascii("/Users/jpwalker/Desktop/positions.txt", a, "7,8,9")
