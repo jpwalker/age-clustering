@@ -106,15 +106,15 @@ if __name__ == "__main__":
                 massbin[1] += 1
             currmass_select_halo = mass_sub_select(halos, massbin[0], massbin[1])
             mass_selected_halos.append(currmass_select_halo)
-            halo_table_filename = '{0}halo_table_{1}.dat'.format(halo_table_outdirec, mass_i)
+            halo_table_filename = '{0}halo_table_{1}_0.dat'.format(halo_table_outdirec, mass_i)
             write_halo_table_ascii(halo_table_filename, currmass_select_halo, \
                                    fmt = '0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20')
             print 'Calculating autocorrelation function for mass selected sample.'
-            xi_auto_filename = '{0}xi_{1}.dat'.format(xi_auto_outdirec, mass_i)
-            xi_cross_filename = '{0}xi_{1}.dat'.format(xi_cross_outdirec, mass_i)
+            xi_auto_filename = '{0}xi_{1}_0.dat'.format(xi_auto_outdirec, mass_i)
+            xi_cross_filename = '{0}xi_{1}_0.dat'.format(xi_cross_outdirec, mass_i)
             check_output(['2pt-autocorrelation', halo_table_filename, xi_auto_filename])
             check_output(['2pt-crosscorrelation', halo_table_filename, halos_filename, xi_cross_filename])
-            calc_bias(xi_cross_filename, xi_m_m, xi_auto_halos, '{0}bias_{1}'.format(bias_direc, mass_i))    
+            calc_bias(xi_cross_filename, xi_m_m, xi_auto_halos, '{0}bias_{1}_0'.format(bias_direc, mass_i))    
             print '{0} halos with {1} <= M < {2} M_Sun'.format(currmass_select_halo['length'], \
                                                            log10(massbin[0] * massconv), \
                                                            log10(massbin[1] * massconv))
