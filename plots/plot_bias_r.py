@@ -4,15 +4,15 @@ import matplotlib.pyplot as plt
 from MillenniumII import *
 from IO import *
 
-direc = '/home/jpwalker/Desktop/z0_attempt1_merg/'
-infile = 'millenniumIIsnap67age_attempt1057fof_mod.txt'
+direc = '/Users/jpwalker/Desktop/z0_attempt1_form_jp/'
+infile = 'millenniumIIsnap67age_attempt1057fof2.txt'
 outfile = 'bias_properties.dat'
 h = 0.73
 massconv = 6.885e6 #Mass conversion reports mass in M_sun
 #Read in the matter matter 2pt-autocorrelation function
 xi_m_m = readfile('{0}xi_m_m.txt'.format(direc), col = 2, delim = ' ')
 #Read in the properties file were mass and age properties are stored.
-prop = readfile('{0}properties.dat'.format(direc), col = 8, delim = '    ', skip = 1)
+prop = readfile('{0}properties.dat'.format(direc), col = 12, delim = '    ', skip = 1)
 plt.figure(1)
 temp1 = 4
 temp2 = 3
@@ -20,13 +20,13 @@ j = [1, 2, 3, 4, 5] #Age bins which will be plotted
 col_j = ['b', 'c', 'g', 'm', 'r'] #Colors of Age bins that are plotted
 #lbl_coords = [[0.25, 0.65, 0.25, 0.65], [0.85, 0.85, 0.4, 0.4]] #Coords of labels on plot
 stored_bias = [[], [], []]
-for mass_i in range(1, 13):
+for mass_i in range(1, 8):
     plt.subplot(temp1, temp2, mass_i)
     plt.axhline(1., linestyle = '-', linewidth = 2)
     mass = []
     for (i, age_i) in enumerate(j):
         idx = np.where(np.logical_and(prop[0] == mass_i, prop[1] == age_i))[0][0]
-        mass.extend([prop[3][idx], prop[4][idx]])
+        mass.extend([prop[3][idx], prop[6][idx]])
         bias = readfile('{0}bias/bias_{1}_{2}'.format(direc, mass_i, age_i), col = 2, delim = ',', skip = 1)
         idx = np.where(np.logical_and(np.logical_and(bias[0] >= 5., bias[0] <= 25.), bias[1] == bias[1]))
         stored_bias[2].append(np.sum(bias[1][idx]) / len(bias[1][idx]))

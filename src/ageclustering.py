@@ -98,7 +98,7 @@ if __name__ == "__main__":
         testnum = 0
         out = open('{0}properties.dat'.format(indirec), 'w')
         out.write('mass_i    age_i    num    min_mass    median_mass    average_mass    max_mass    age_key    \
-        min_age    median_age    average_age    max_age\n')
+        min_age    median_age    average_age    max_age    bias\n')
         for mass_i in range(1, num_mass_bins + 1):
             massbin = [massbins[(mass_i - 1) * 2], massbins[(mass_i - 1) * 2 + 1]]
             #massbin[1] = scoreatpercentile(get_col_halo_table(halos, 'fof_np'), mass_i * 100. / num_mass_bins)
@@ -132,15 +132,6 @@ if __name__ == "__main__":
                 print 'Age bin {0}: {1} <= Age < {2}'.format(age_i, agebin[0], agebin[1])
                 currage_select_halo = age_sub_select(currmass_select_halo, agekey, agebin[0], agebin[1])
                 age_selected_halos.append(currage_select_halo)
-                out.write('{0}\n'.format('    '.join([str(mass_i), str(age_i), str(currage_select_halo['length']), \
-                                   str(min(get_col_halo_table(currage_select_halo, 'fof_np'))), \
-                                   str(np.median(get_col_halo_table(currage_select_halo, 'fof_np'))), \
-                                   str(np.average(get_col_halo_table(currage_select_halo, 'fof_np'))), \
-                                   str(max(get_col_halo_table(currage_select_halo, 'fof_np'))), \
-                                   agekey, str(min(get_col_halo_table(currage_select_halo, agekey))), \
-                                   str(np.median(get_col_halo_table(currage_select_halo, agekey))), \
-                                   str(np.average(get_col_halo_table(currage_select_halo, agekey))), \
-                                   str(max(get_col_halo_table(currage_select_halo, agekey)))])))
                 print '{0} halos in age bin.'.format(currage_select_halo['length'])
                 #Saving halo table to file
                 halo_table_filename = '{0}halo_table_{1}_{2}.dat'.format(halo_table_outdirec, mass_i, age_i)
@@ -151,10 +142,55 @@ if __name__ == "__main__":
                 check_output(['2pt-autocorrelation', halo_table_filename, xi_auto_filename])
                 check_output(['2pt-crosscorrelation', halo_table_filename, halos_filename, xi_cross_filename])
                 calc_bias(xi_cross_filename, xi_m_m, xi_auto_halos, '{0}bias_{1}_{2}'.format(bias_direc, mass_i, age_i))
+                out.write('{0}\n'.format('    '.join([str(mass_i), str(age_i), str(currage_select_halo['length']), \
+                                   str(min(get_col_halo_table(currage_select_halo, 'fof_np'))), \
+                                   str(np.median(get_col_halo_table(currage_select_halo, 'fof_np'))), \
+                                   str(np.average(get_col_halo_table(currage_select_halo, 'fof_np'))), \
+                                   str(max(get_col_halo_table(currage_select_halo, 'fof_np'))), \
+                                   agekey, str(min(get_col_halo_table(currage_select_halo, agekey))), \
+                                   str(np.median(get_col_halo_table(currage_select_halo, agekey))), \
+                                   str(np.average(get_col_halo_table(currage_select_halo, agekey))), \
+                                   str(max(get_col_halo_table(currage_select_halo, agekey)))])))
                 testnum += currage_select_halo['length']
                 agebin[0] = agebin[1]
             massbin[0] = massbin[1]
         print 'Finished processing {0} halos!'.format(testnum)
+        out.close()
+        #Calculate the clustering based on age dependence only.
+        out = open('{0}properties2.dat'.format(indirec), 'w')
+        unsorted_ages = get_col_halo_table(halos, agekey)
+        low_age = min(unsorted_ages)
+        for age_i in range(1, num_age_bins + 1):
+            print 'Processing age bin: {0}'.format(age_i)
+            if age_i < num_age_bins:
+                high_age = scoreatpercentile(unsorted_ages, age_i * (100.) / num_age_bins)
+            else:
+                high_age = max(unsorted_ages)
+            selected_halos = age_sub_select(halos, agekey, low_age, high_age)
+            out.write('{0}\n'.format('    '.join([str(mass_i), str(age_i), str(selected_halos['length']), \
+                                                  str(min(get_col_halo_table(selected_halos, 'fof_np'))), \
+                                                  str(np.median(get_col_halo_table(selected_halos, 'fof_np'))), \
+                                                  str(np.average(get_col_halo_table(selected_halos, 'fof_np'))), \
+                                                  str(max(get_col_halo_table(selected_halos, 'fof_np'))), \
+                                                  agekey, str(min(get_col_halo_table(selected_halos, agekey))), \
+                                                  str(np.median(get_col_halo_table(selected_halos, agekey))), \
+                                                  str(np.average(get_col_halo_table(selected_halos, agekey))), \
+                                                  str(max(get_col_halo_table(selected_halos, agekey)))])))
+            print '{0} halos in age bin.'.format(selected_halos['length'])
+            out_halo_name = '{0}halo_table_0_{1}.dat'.format(halo_table_outdirec, age_i)
+            #Write selected halos to file
+            write_halo_table_ascii(out_halo_name, selected_halos, \
+                                   fmt = '0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20')
+            #Calculate the auto, cross and bias for these halos and write out to file
+            xi_auto_filename = '{0}xi_0_{1}.dat'.format(xi_auto_outdirec, age_i)
+            xi_cross_filename = '{0}xi_0_{1}.dat'.format(xi_cross_outdirec, age_i)
+            bias_filename = '{0}bias_0_{1}'.format(bias_direc, age_i)
+            check_output(['2pt-autocorrelation', out_halo_name, xi_auto_filename])
+            check_output(['2pt-crosscorrelation', out_halo_name, halos_filename, xi_cross_filename])
+            calc_bias(xi_cross_filename, xi_m_m, xi_auto_halos, bias_filename)
+            #Redefine the low_age for next pass
+            low_age = high_age
+            #End of the clustering of age selected only subset
         out.close()
     else:
         print 'Error: Check number of arguments'

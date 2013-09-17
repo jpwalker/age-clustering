@@ -54,7 +54,7 @@ if __name__ == '__main__':
     low_age = min(unsorted_ages)
     avg_age = []
     bias = []
-    for age_i in range(num_agebins + 1):
+    for age_i in range(1, num_agebins + 1):
         print 'Processing age bin: {0}'.format(age_i)
         if age_i < num_agebins:
             high_age = scoreatpercentile(unsorted_ages, (age_i + 1.) * (100.) / num_agebins)
