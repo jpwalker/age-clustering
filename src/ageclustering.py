@@ -67,18 +67,35 @@ def calc_bias(xi_cross_filename, xi_m_m, xi_auto_halos, bias_filename):
     bias = np.array([age_selected_halos_xi_cross[0], age_selected_halos_xi_cross[1] / np.sqrt(xi_m_m[1] * \
                                                                                               xi_auto_halos[1])])
     writefile(bias_filename, bias, delim = ',',  note = 'radii, bias')
+    return bias
+
+def write_properties(filestr, halos, agekey, mass_i, age_i, bias):
+    filestr.write('{0}\n'.format('    '.join([str(mass_i), str(age_i), str(halos['length']), \
+                                   str(min(get_col_halo_table(halos, 'fof_np'))), \
+                                   str(np.median(get_col_halo_table(halos, 'fof_np'))), \
+                                   str(np.average(get_col_halo_table(halos, 'fof_np'))), \
+                                   str(max(get_col_halo_table(halos, 'fof_np'))), \
+                                   agekey, str(min(get_col_halo_table(halos, agekey))), \
+                                   str(np.median(get_col_halo_table(halos, agekey))), \
+                                   str(np.average(get_col_halo_table(halos, agekey))), \
+                                   str(max(get_col_halo_table(halos, agekey))), str(bias)])))
 
 if __name__ == "__main__":
-    if len(sys.argv) == 4:
+    #if len(sys.argv) == 4:
         h = 0.73
         massconv = 6.885e6 / h
         num_mass_bins = 7
         num_age_bins = 5
-        agekey = sys.argv[1]
+        #agekey = sys.argv[1]
+        agekey = 'form_jp'
         #Read in data from age files
-        indirec = '{0}/'.format(getcwd())
-        infile = sys.argv[2]
-        halos = read_halo_table_ascii(indirec + infile, fmt = sys.argv[3])
+        #indirec = '{0}/'.format(getcwd())
+        indirec = '/Users/jpwalker/Desktop/z0_attempt1_form_jp/'
+        #infile = sys.argv[2]
+        infile = 'millenniumIIsnap67age_attempt1057fof_2.txt'
+        #fmt = sys.argv[3]
+        fmt = 'x,x,x,x,x,x,x,7,8,9,x,x,x,17,x,21,22,23,24,25,27,26,28,29'
+        halos = read_halo_table_ascii(indirec + infile, fmt = fmt)
         halos_filename = '{0}halo_table_{1}'.format(indirec, infile)
         xi_halos = '{0}xi_{1}'.format(indirec, infile)
         print 'Halos read into memory...'
@@ -112,9 +129,11 @@ if __name__ == "__main__":
             print 'Calculating autocorrelation function for mass selected sample.'
             xi_auto_filename = '{0}xi_{1}_0.dat'.format(xi_auto_outdirec, mass_i)
             xi_cross_filename = '{0}xi_{1}_0.dat'.format(xi_cross_outdirec, mass_i)
+            write_properties(out, currmass_select_halo, agekey, mass_i, 0, b)
             check_output(['2pt-autocorrelation', halo_table_filename, xi_auto_filename])
             check_output(['2pt-crosscorrelation', halo_table_filename, halos_filename, xi_cross_filename])
-            calc_bias(xi_cross_filename, xi_m_m, xi_auto_halos, '{0}bias_{1}_0'.format(bias_direc, mass_i))    
+            b = calc_bias(xi_cross_filename, xi_m_m, xi_auto_halos, '{0}bias_{1}_0'.format(bias_direc, mass_i))    
+            write_properties(out, currmass_select_halo, agekey, mass_i, 0, b)
             print '{0} halos with {1} <= M < {2} M_Sun'.format(currmass_select_halo['length'], \
                                                            log10(massbin[0] * massconv), \
                                                            log10(massbin[1] * massconv))
@@ -192,6 +211,6 @@ if __name__ == "__main__":
             low_age = high_age
             #End of the clustering of age selected only subset
         out.close()
-    else:
-        print 'Error: Check number of arguments'
-        raise TypeError
+  #  else:
+   #     print 'Error: Check number of arguments'
+    #    raise TypeError
