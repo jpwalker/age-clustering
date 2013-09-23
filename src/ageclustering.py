@@ -77,22 +77,23 @@ def write_properties(filestr, halos, agekey, mass_i, age_i):
                                    str(max(get_col_halo_table(halos, 'fof_np'))), \
                                    agekey, str(min(get_col_halo_table(halos, agekey))), \
                                    str(np.median(get_col_halo_table(halos, agekey))), \
-                                   str(np.average(get_col_halo_table(halos, agekey)))])))
+                                   str(np.average(get_col_halo_table(halos, agekey))), \
+                                   str(max(get_col_halo_table(halos, agekey)))])))
 
 if __name__ == "__main__":
-    #if len(sys.argv) == 4:
+    if len(sys.argv) == 4:
         h = 0.73
         massconv = 6.885e6 / h
         num_mass_bins = 7
         num_age_bins = 5
-        #agekey = sys.argv[1]
-        agekey = 'form_jp'
+        agekey = sys.argv[1]
+        #agekey = 'form_jp'
         #Read in data from age files
-        #indirec = '{0}/'.format(getcwd())
-        indirec = '/Users/jpwalker/Desktop/z0_attempt1_form_jp/'
-        #infile = sys.argv[2]
-        infile = 'millenniumIIsnap67age_attempt1057fof_2.txt'
-        #fmt = sys.argv[3]
+        indirec = '{0}/'.format(getcwd())
+        #indirec = '/Users/jpwalker/Desktop/z0_attempt1_form_jp/'
+        infile = sys.argv[2]
+        #infile = 'millenniumIIsnap67age_attempt1057fof_2.txt'
+        fmt = sys.argv[3]
         fmt = 'x,x,x,x,x,x,x,7,8,9,x,x,x,17,x,21,22,23,24,25,27,26,28,29'
         halos = read_halo_table_ascii(indirec + infile, fmt = fmt)
         halos_filename = '{0}halo_table_{1}'.format(indirec, infile)
@@ -114,10 +115,9 @@ if __name__ == "__main__":
         testnum = 0
         out = open('{0}properties.dat'.format(indirec), 'w')
         out.write('mass_i    age_i    num    min_mass    median_mass    average_mass    max_mass    age_key    \
-        min_age    median_age    average_age    max_age    bias\n')
+        min_age    median_age    average_age    max_age\n')
         for mass_i in range(1, num_mass_bins + 1):
             massbin = [massbins[(mass_i - 1) * 2], massbins[(mass_i - 1) * 2 + 1]]
-            #massbin[1] = scoreatpercentile(get_col_halo_table(halos, 'fof_np'), mass_i * 100. / num_mass_bins)
             if mass_i == num_mass_bins:
                 massbin[1] += 1
             currmass_select_halo = mass_sub_select(halos, massbin[0], massbin[1])
@@ -128,7 +128,7 @@ if __name__ == "__main__":
             print 'Calculating autocorrelation function for mass selected sample.'
             xi_auto_filename = '{0}xi_{1}_0.dat'.format(xi_auto_outdirec, mass_i)
             xi_cross_filename = '{0}xi_{1}_0.dat'.format(xi_cross_outdirec, mass_i)
-            write_properties(out, currmass_select_halo, agekey, mass_i, 0, b)
+            write_properties(out, currmass_select_halo, agekey, mass_i, 0)
             check_output(['2pt-autocorrelation', halo_table_filename, xi_auto_filename])
             check_output(['2pt-crosscorrelation', halo_table_filename, halos_filename, xi_cross_filename])
             b = calc_bias(xi_cross_filename, xi_m_m, xi_auto_halos, '{0}bias_{1}_0'.format(bias_direc, mass_i))    
@@ -167,7 +167,6 @@ if __name__ == "__main__":
         print 'Finished processing {0} halos!'.format(testnum)
         out.close()
         #Calculate the clustering based on age dependence only.
-        out = open('{0}properties2.dat'.format(indirec), 'w')
         unsorted_ages = get_col_halo_table(halos, agekey)
         low_age = min(unsorted_ages)
         testnum = 0
@@ -191,12 +190,13 @@ if __name__ == "__main__":
             check_output(['2pt-autocorrelation', out_halo_name, xi_auto_filename])
             check_output(['2pt-crosscorrelation', out_halo_name, halos_filename, xi_cross_filename])
             calc_bias(xi_cross_filename, xi_m_m, xi_auto_halos, bias_filename)
+            write_properties(out, selected_halos, agekey, 0, age_i)
             testnum += selected_halos['length']
             #Redefine the low_age for next pass
             low_age = high_age
             #End of the clustering of age selected only subset
         print testnum, halos['length']
         out.close()
-  #  else:
-   #     print 'Error: Check number of arguments'
-    #    raise TypeError
+    else:
+        print 'Error: Check number of arguments'
+        raise TypeError
