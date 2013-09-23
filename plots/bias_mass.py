@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 if __name__ == '__main__':
     h = 0.73
     massconv = 6.885e6 #Mass conversion reports mass in M_sun/h
-    direc = '/home/jpwalker/Desktop/z0_attempt1_form_jp/'
+    direc = '/Users/jpwalker/Desktop/z0_attempt1_form_jp/'
     ifile = 'properties.dat'
     data = readfile('{0}{1}'.format(direc, ifile), col = 12, delim = '    ', skip = 1)
     age_bins = 5
@@ -19,9 +19,8 @@ if __name__ == '__main__':
     for age_i in range(1, age_bins + 1):
         bias = []
         mass = []
-        for j in range(1, mass_bins + 1):
+        for mass_i in range(1, mass_bins + 1):
             b_data = readfile('{0}bias/bias_{1}_{2}', col = 2, delim = ',', skip = 1)
-            
             bias.append(data[2][idx][0])
             mass.append(data[4][j])
         bias = np.array(bias)
