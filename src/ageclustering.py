@@ -131,8 +131,7 @@ if __name__ == "__main__":
             write_properties(out, currmass_select_halo, agekey, mass_i, 0)
             check_output(['2pt-autocorrelation', halo_table_filename, xi_auto_filename])
             check_output(['2pt-crosscorrelation', halo_table_filename, halos_filename, xi_cross_filename])
-            b = calc_bias(xi_cross_filename, xi_m_m, xi_auto_halos, '{0}bias_{1}_0'.format(bias_direc, mass_i))    
-            write_properties(out, currmass_select_halo, agekey, mass_i, 0)
+            b = calc_bias(xi_cross_filename, xi_m_m, xi_auto_halos, '{0}bias_{1}_0'.format(bias_direc, mass_i))
             print '{0} halos with {1} <= M < {2} M_Sun'.format(currmass_select_halo['length'], \
                                                            log10(massbin[0] * massconv), \
                                                            log10(massbin[1] * massconv))
@@ -165,7 +164,6 @@ if __name__ == "__main__":
                 agebin[0] = agebin[1]
             massbin[0] = massbin[1]
         print 'Finished processing {0} halos!'.format(testnum)
-        out.close()
         #Calculate the clustering based on age dependence only.
         unsorted_ages = get_col_halo_table(halos, agekey)
         low_age = min(unsorted_ages)
@@ -175,7 +173,7 @@ if __name__ == "__main__":
             if age_i < num_age_bins:
                 high_age = scoreatpercentile(unsorted_ages, age_i * (100.) / num_age_bins)
             else:
-                high_age = max(unsorted_ages)
+                high_age = max(unsorted_ages) + 1.
             selected_halos = age_sub_select(halos, agekey, low_age, high_age)
             write_properties(out, selected_halos, agekey, 0, age_i)
             print '{0} halos in age bin.'.format(selected_halos['length'])
@@ -190,7 +188,6 @@ if __name__ == "__main__":
             check_output(['2pt-autocorrelation', out_halo_name, xi_auto_filename])
             check_output(['2pt-crosscorrelation', out_halo_name, halos_filename, xi_cross_filename])
             calc_bias(xi_cross_filename, xi_m_m, xi_auto_halos, bias_filename)
-            write_properties(out, selected_halos, agekey, 0, age_i)
             testnum += selected_halos['length']
             #Redefine the low_age for next pass
             low_age = high_age

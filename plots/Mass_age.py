@@ -98,14 +98,14 @@ def plot_redshift(redshifts, fof_np):
     plt.show()    
 
 if __name__ == '__main__':
-    direc = '/home/jpwalker/Desktop/z0_attempt1_merg/'
-    infile = 'millenniumIIsnap67age_attempt1057fof_mod.txt'
-    age_key = 'merg'
+    direc = '/Users/jpwalker/Desktop/z0_attempt1_form_jp_test/'
+    infile = 'millenniumIIsnap67age_attempt1057fof_2.txt'
+    age_key = 'form_gao'
     h = 0.73
     massconv = 6.885e6 #Mass conversion reports mass in M_sun/h
     #Read in all halos
     halos = read_halo_table_ascii('{0}{1}'.format(direc, infile), \
-                                  fmt = 'x,x,x,x,x,x,x,x,x,x,x,x,x,17,x,21,22,23')
+                                  fmt = 'x,x,x,x,x,x,x,x,x,x,x,x,x,17,x,21,22,23,24,25,27,26,28,29')
     fof_np = np.array(get_col_halo_table(halos, 'fof_np')) * massconv
     form = np.array(get_col_halo_table(halos, age_key)) 
     redshifts = 1.44224957031 * np.sinh(0.0969815 * (13.5795 - form)) ** (-2. / 3.)
