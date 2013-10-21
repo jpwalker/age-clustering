@@ -30,17 +30,17 @@ def get_bin_mean(data, b_start, b_end):
     else:
         return (None, idx)
 
-def plot_age(form, fof_np):
+def plot_age(form, fof_np, age_labels):
     lims = 10. ** np.linspace(9, 15, (15.25-9) / .25) #These are the limits for the mass bins
-    (avg, med) = binning(fof_np, form, lims)
-    plt.semilogx(avg[0], avg[1], '+b', subsx = [2, 3, 4, 5, 6, 7, 8, 9], label = 'Average')
-    plt.semilogx(med[0], med[1], 'b', linestyle = 'dashed', label = 'Median')
-    MS = 13.5795 - 10.3112 * np.arcsinh(0.0504329 * avg[0] ** 0.08445)
-    plt.semilogx(avg[0], MS, 'r', label = 'MS Curve')
+    for (i, form_i) in enumerate(form):
+        (avg, med) = binning(fof_np[i], form_i, lims)
+        plt.semilogx(avg[0], avg[1],'+', subsx = [2, 3, 4, 5, 6, 7, 8, 9], label = 'Average {0}'.format(age_labels[i]))
+        plt.semilogx(med[0], med[1], linestyle = 'dashed', label = 'Median {0}'.format(age_labels[i]))
+    #MS = 13.5795 - 10.3112 * np.arcsinh(0.0504329 * avg[0] ** 0.08445)
+    #plt.semilogx(avg[0], MS, 'r', label = 'MS Curve')
     plt.legend()
     plt.xlabel('M [M_sun / h]')
     plt.ylabel('Formation Age Lookback time [Gyr]')
-    
     ##Create Second x axis
     xlims = plt.xlim()
     x2 = plt.twiny()
@@ -49,6 +49,7 @@ def plot_age(form, fof_np):
     x2.set_xlabel('M [M_sun]')
     
     ##Create second y axis
+    
     ylims = plt.ylim()
     yt = plt.yticks()[0]
     y2 = plt.twinx()
@@ -62,13 +63,13 @@ def plot_age(form, fof_np):
             yl.append('')
     y2.set_yticklabels(yl)
     y2.set_ylabel('z + 1')
-    
     plt.show()
     
-def plot_redshift(redshifts, fof_np):
+def plot_redshift(redshifts, fof_np, age_labels):
     lims = 10. ** np.linspace(9, 15, (15.25-9) / .25)
-    (avg, med) = binning(fof_np, redshifts, lims)
-    plt.semilogx(avg[0], avg[1], '+b', subsx = [2, 3, 4, 5, 6, 7, 8, 9], label = 'Average')
+    for (i, red_i) in enumerate(redshifts): 
+        (avg, med) = binning(fof_np[i], red_i, lims)
+        plt.semilogx(avg[0], avg[1], '+', subsx = [2, 3, 4, 5, 6, 7, 8, 9], label = 'Average {0}'.format(age_labels[i]))
     #plt.semilogx(med[0], med[1], 'b', linestyle = 'dashed', label = 'Median')
     MS = 2.89 * (avg[0] / 10. ** 10.) ** -0.0563
     plt.semilogx(avg[0], MS, 'r', label = 'MS Curve')
@@ -94,25 +95,25 @@ def plot_redshift(redshifts, fof_np):
         yl.append('{:5.2f}'.format(13.5795 - mth.asinh((j / 1.4424957031) ** (-3. / 2.)) / 0.0969815))
     y2.set_yticklabels(yl)
     y2.set_ylabel('Lookbacktime')
-    
     plt.show()    
 
 if __name__ == '__main__':
-    direc = '/Users/jpwalker/Desktop/z0_attempt1_form_jp_test/'
+    direc = '/Users/jpwalker/Desktop/age-clustering-data/z0_attempt1_form_jp/'
     infile = 'millenniumIIsnap67age_attempt1057fof_2.txt'
-    age_key = 'form_gao'
+    age_key = ['form_gao', 'form_jp']
+    age_labels = ['Lit. Form. Age', 'Form. Age']
     h = 0.73
     massconv = 6.885e6 #Mass conversion reports mass in M_sun/h
     #Read in all halos
     halos = read_halo_table_ascii('{0}{1}'.format(direc, infile), \
-                                  fmt = 'x,x,x,x,x,x,x,x,x,x,x,x,x,17,x,21,22,23,24,25,27,26,28,29')
-    fof_np = np.array(get_col_halo_table(halos, 'fof_np')) * massconv
-    form = np.array(get_col_halo_table(halos, age_key)) 
-    redshifts = 1.44224957031 * np.sinh(0.0969815 * (13.5795 - form)) ** (-2. / 3.)
-    #plt.semilogx(fof_np, form, 'k.')
-    plot_age(form, fof_np)
-    plot_redshift(redshifts, fof_np)
-    plt.hist(form, bins = 20)
-    plt.show()
-    plt.hist(redshifts, bins = 20)
-    plt.show()
+                                  fmt = 'x,x,x,x,x,x,x,x,x,x,x,x,x,17,x,21,22,23,24,26,28,25,27,29')
+    form = []
+    redshifts = []
+    fof_np = []
+    for i in age_key:
+        fof_np.append(np.array(get_col_halo_table(halos, 'fof_np')) * massconv)
+        form.append(np.array(get_col_halo_table(halos, i))) 
+        redshifts.append(1.44224957031 * np.sinh(0.0969815 * (13.5795 - form[-1])) ** (-2. / 3.))
+    plot_age(form, fof_np, age_labels)
+    plot_redshift(redshifts, fof_np, age_labels)
+    

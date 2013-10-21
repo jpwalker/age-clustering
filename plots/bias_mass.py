@@ -10,14 +10,14 @@ import matplotlib.pyplot as plt
 if __name__ == '__main__':
     h = 0.73
     massconv = 6.885e6 #Mass conversion reports mass in M_sun/h
-    direc = '/Users/jpwalker/Desktop/z3.1_attempt1_form_gao/'
+    direc = '/Users/jpwalker/Desktop/age-clustering-data/z0_attempt1_form_jp/'
     ifile = 'properties.dat'
-    agekey = 'Form. Gao'
+    agekey = 'Form. Age'
     data = readfile('{0}{1}'.format(direc, ifile), col = 12, delim = '    ', skip = 1)
     age_bins = 5
     mass_bins = 7
-    col_j = ['k', 'b', 'c', 'g', 'm', 'r'] #Colors of Age bins that are plotted
-    for age_i in range(0, age_bins + 1):
+    col_j = ['b', 'c', 'g', 'm', 'r'] #Colors of Age bins that are plotted
+    for age_i in range(1, age_bins + 1):
         bias = []
         mass = []
         for mass_i in range(1, mass_bins + 1):
@@ -28,8 +28,8 @@ if __name__ == '__main__':
             mass.append(data[4][idx2])
         bias = np.array(bias)
         mass = np.array(mass)
-        plt.semilogx(mass * massconv, bias, color = col_j[age_i], label = '{0}_{1}'.format(agekey, age_i))
-    plt.xlabel('Median Mass [M_sun / h]')
+        plt.semilogx(mass * massconv / h, bias, color = col_j[age_i - 1], label = '{0}_{1}'.format(agekey, age_i))
+    plt.xlabel('Median Mass [M_sun]')
     plt.ylabel('Bias')
     plt.legend()
     plt.show()

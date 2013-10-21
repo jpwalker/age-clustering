@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 # ageclustering.py
 
 """This code reads in MillenniumII data bins it in mass and age and calculates
@@ -12,7 +12,6 @@ from scipy.stats import scoreatpercentile
 from os import mkdir, getcwd
 from subprocess import check_output
 from IO import *
-import matplotlib.pyplot as plt
 
 def mass_sub_select(halos, leftmass, rightmass):
     halos2 = create_halo_table()
@@ -75,6 +74,22 @@ def write_properties(filestr, halos, agekey, mass_i, age_i):
                                    str(np.median(get_col_halo_table(halos, 'fof_np'))), \
                                    str(np.average(get_col_halo_table(halos, 'fof_np'))), \
                                    str(max(get_col_halo_table(halos, 'fof_np'))), \
+                                   str(min(get_col_halo_table(halos, 'max_tree_mass'))), \
+                                   str(np.median(get_col_halo_table(halos, 'max_tree_mass'))), \
+                                   str(np.average(get_col_halo_table(halos, 'max_tree_mass'))), \
+                                   str(max(get_col_halo_table(halos, 'max_tree_mass'))), \
+                                   str(min(get_col_halo_table(halos, 'max_tree_mass_snap'))), \
+                                   str(np.median(get_col_halo_table(halos, 'max_tree_mass_snap'))), \
+                                   str(np.average(get_col_halo_table(halos, 'max_tree_mass_snap'))), \
+                                   str(max(get_col_halo_table(halos, 'max_tree_mass_snap'))), \
+                                   str(min(get_col_halo_table(halos, 'min_mass_root_max'))), \
+                                   str(np.median(get_col_halo_table(halos, 'min_mass_root_max'))), \
+                                   str(np.average(get_col_halo_table(halos, 'min_mass_root_max'))), \
+                                   str(max(get_col_halo_table(halos, 'min_mass_root_max'))), \
+                                   str(min(get_col_halo_table(halos, 'min_mass_root_max_snap'))), \
+                                   str(np.median(get_col_halo_table(halos, 'min_mass_root_max_snap'))), \
+                                   str(np.average(get_col_halo_table(halos, 'min_mass_root_max_snap'))), \
+                                   str(max(get_col_halo_table(halos, 'min_mass_root_max_snap'))), \
                                    agekey, str(min(get_col_halo_table(halos, agekey))), \
                                    str(np.median(get_col_halo_table(halos, agekey))), \
                                    str(np.average(get_col_halo_table(halos, agekey))), \
@@ -94,7 +109,7 @@ if __name__ == "__main__":
         infile = sys.argv[2]
         #infile = 'millenniumIIsnap67age_attempt1057fof_2.txt'
         fmt = sys.argv[3]
-        fmt = 'x,x,x,x,x,x,x,7,8,9,x,x,x,17,x,21,22,23,24,25,27,26,28,29'
+        #fmt = 'x,x,x,x,x,x,x,7,8,9,x,x,x,17,x,21,22,23,24,25,27,26,28,29'
         halos = read_halo_table_ascii(indirec + infile, fmt = fmt)
         halos_filename = '{0}halo_table_{1}'.format(indirec, infile)
         xi_halos = '{0}xi_{1}'.format(indirec, infile)
@@ -114,8 +129,11 @@ if __name__ == "__main__":
         age_selected_halos_xi_cross = [] #Stores the 2pt-crosscorr for the age_selected halos and all halos table
         testnum = 0
         out = open('{0}properties.dat'.format(indirec), 'w')
-        out.write('mass_i    age_i    num    min_mass    median_mass    average_mass    max_mass    age_key    \
-        min_age    median_age    average_age    max_age\n')
+        out.write('mass_i    age_i    num    min_mass    median_mass    average_mass    max_mass    min_max_tree_mass    \
+        median_max_tree_mass    average_max_tree_mass    max_max_tree_mass    min_max_tree_mass_snap    median_max_tree_mass_snap    \
+        average_max_tree_mass_snap    max_max_tree_mass_snap    min_min_mass_root_max    median_min_mass_root_max    \
+        average_min_mass_root_max    max_min_mass_root_max    min_min_mass_root_max_snap    median_min_mass_root_max_snap    \
+        average_min_mass_root_max_snap    max_min_mass_root_max_snap    age_key    min_age    median_age    average_age    max_age\n')
         for mass_i in range(1, num_mass_bins + 1):
             massbin = [massbins[(mass_i - 1) * 2], massbins[(mass_i - 1) * 2 + 1]]
             if mass_i == num_mass_bins:
