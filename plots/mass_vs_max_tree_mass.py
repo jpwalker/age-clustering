@@ -32,8 +32,9 @@ def one_to_one():
     plt.loglog([mi, ma], [mi, ma], '--')
     
 if __name__ == '__main__':
+    homed = '{0}/'.format(os.environ['HOME'])
     cwd = '{0}/'.format(os.getcwd())
-    direc = '/Users/jpwalker/Desktop/age-clustering attempt 1/z0_attempt1_form_gao/'
+    direc = '{0}Desktop/age-clustering attempt 2/z0_attempt1_form_jp/'.format(homed)
     filename = 'millenniumIIsnap67age_attempt1057fof_2.txt'
     formt = '0,1,2,3,4,5,6,7,8,9,10,11,15,17,16,21,22,23,24,26,28,25,27,29'
     data = read_halo_table_ascii('{0}{1}'.format(direc, filename), formt)
@@ -50,4 +51,4 @@ if __name__ == '__main__':
     write_halo_table_ascii('{0}{1}'.format(cwd, 'sig_massloss.txt'), \
                            select_halo_table(data, idx1[0]), formt)
     write_halo_table_ascii('{0}{1}'.format(cwd, 'no_sig_massloss.txt'), \
-                           select_halo_table(data, idx1[0]), formt)
+                           select_halo_table(data, idx2[0]), formt)
