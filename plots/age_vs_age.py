@@ -7,6 +7,8 @@ from MillenniumII import *
 import matplotlib.pyplot as plt
 import numpy.random as rnd
 import numpy as np
+import os
+import scipy.stats as sts
 
 def find_centers(xedges):
     if len(xedges) >= 2:
@@ -18,7 +20,8 @@ def find_centers(xedges):
         raise ValueError('Number of edges has to be greater than 2')
 
 if __name__ == '__main__':
-    direc = '/Users/jpwalker/Desktop/age-clustering-data/z0_attempt1_form_jp/'
+    home = '{0}/'.format(os.environ['HOME'])
+    direc = '{0}Desktop/age-clustering-data/age-clustering attempt 1/z0_attempt1_form_jp/'.format(home)
     age_file = 'millenniumIIsnap67age_attempt1057fof_2.txt'
     agekeys = ['form_jp', 'form_gao']
     lbls = ['Form. Age', 'Lit. Form. Age']
@@ -39,12 +42,20 @@ if __name__ == '__main__':
             x[x_i][y_i] = xc
             y[x_i][y_i] = yc
     idx = np.where(age1 > age2)
-    plt.plot(age1[idx], age2[idx], '.', color = 'k')
+    plt.plot(age1, age2, '.', color = 'k')
     rng = [min(np.reshape(np.log10(z[0]), num_xbins * num_ybins)), max(np.reshape(np.log10(z[0]), num_xbins * num_ybins))]
     if rng[0] == float('-inf'):
         rng[0] = 0.1
     lvls = np.linspace(0.35 * (rng[1] - rng[0]) + rng[0], rng[1], 15)
-    plt.contour(x, y, np.log10(z[0]), colors = 'r', levels = lvls)
+    #plt.contour(x, y, np.log10(z[0]), colors = 'r', levels = lvls)
+    for i in range(1, 5):
+        plt.vlines(sts.scoreatpercentile(age1, i * .2 * 100), 0, 14, 'r', linewidth = 2)
+        plt.hlines(sts.scoreatpercentile(age2, i * .2 * 100), 0, 14, 'r', linewidth = 2)
+    firstquintus = sts.scoreatpercentile(age1, 20.)
+    lastquintgao = sts.scoreatpercentile(age2, 80.)
+    print float(len(np.where(np.logical_and(age1 <= firstquintus, age2 > lastquintgao))[0]))
     plt.xlabel(lbls[0])
     plt.ylabel(lbls[1])
     plt.show()
+    
+    
