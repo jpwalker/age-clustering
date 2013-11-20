@@ -6,14 +6,17 @@ Created on Aug 22, 2013
 
 from IO import *
 import matplotlib.pyplot as plt
+import os
+import numpy as np
 
 if __name__ == '__main__':
     h = 0.73
     massconv = 6.885e6 #Mass conversion reports mass in M_sun/h
-    direc = '/Users/jpwalker/Desktop/age-clustering-data/z0_attempt1_form_jp/'
+    home = '{0}/'.format(os.environ['HOME'])
+    direc = '{0}Desktop/age-clustering-data/age-clustering attempt 2/z0_attempt1_form_jp/'.format(home)
     ifile = 'properties.dat'
     agekey = 'Form. Age'
-    data = readfile('{0}{1}'.format(direc, ifile), col = 12, delim = '    ', skip = 1)
+    data = readfile('{0}{1}'.format(direc, ifile), col = 28, delim = '    ', skip = 1)
     age_bins = 5
     mass_bins = 7
     col_j = ['b', 'c', 'g', 'm', 'r'] #Colors of Age bins that are plotted
