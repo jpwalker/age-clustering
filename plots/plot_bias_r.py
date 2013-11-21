@@ -3,8 +3,10 @@
 import matplotlib.pyplot as plt
 from MillenniumII import *
 from IO import *
+import os
 
-direc = '/Users/jpwalker/Desktop/z0_attempt1_form_jp/'
+home = '{0}/'.format(os.environ['HOME'])
+direc = '{0}Desktop/age-clustering-data/age-clustering attempt 2/z0_attempt1_form_jp/'.format(home)
 infile = 'millenniumIIsnap67age_attempt1057fof2.txt'
 outfile = 'bias_properties.dat'
 h = 0.73
@@ -12,9 +14,9 @@ massconv = 6.885e6 #Mass conversion reports mass in M_sun
 #Read in the matter matter 2pt-autocorrelation function
 xi_m_m = readfile('{0}xi_m_m.txt'.format(direc), col = 2, delim = ' ')
 #Read in the properties file were mass and age properties are stored.
-prop = readfile('{0}properties.dat'.format(direc), col = 12, delim = '    ', skip = 1)
+prop = readfile('{0}properties.dat'.format(direc), col = 28, delim = ' ', skip = 1)
 plt.figure(1)
-temp1 = 4
+temp1 = 3
 temp2 = 3
 j = [1, 2, 3, 4, 5] #Age bins which will be plotted
 col_j = ['b', 'c', 'g', 'm', 'r'] #Colors of Age bins that are plotted

@@ -19,6 +19,14 @@ def find_centers(xedges):
     else:
         raise ValueError('Number of edges has to be greater than 2')
 
+def plot_percentiles(data, numbins, xlim, ylim, vert = True, color = 'k', linestyle = 'solid', linew = 2):
+    perc = 1. / numbins 
+    for i in range(1, numbins):
+        if vert:
+            plt.vlines(sts.scoreatpercentile(data, i * perc * 100.), ylim[0], ylim[1], color, linestyle, linewidth = linew)
+        else:
+            plt.hlines(sts.scoreatpercentile(data, i * perc * 100.), xlim[0], xlim[1], color, linestyle, linewidth = linew)
+
 if __name__ == '__main__':
     home = '{0}/'.format(os.environ['HOME'])
     direc = '{0}Desktop/age-clustering-data/age-clustering attempt 1/z0_attempt1_form_jp/'.format(home)
@@ -41,21 +49,40 @@ if __name__ == '__main__':
         for (y_i, yc) in enumerate(ycenters):
             x[x_i][y_i] = xc
             y[x_i][y_i] = yc
-    idx = np.where(age1 > age2)
-    plt.plot(age1, age2, '.', color = 'k')
+    #idx = np.where(age1 > age2)
+    plt.figure(1)
+    plt.subplot(2,2,4)
+    #plt.plot(age1[idx], age2[idx], '.', color = 'k')
     rng = [min(np.reshape(np.log10(z[0]), num_xbins * num_ybins)), max(np.reshape(np.log10(z[0]), num_xbins * num_ybins))]
     if rng[0] == float('-inf'):
         rng[0] = 0.1
     lvls = np.linspace(0.35 * (rng[1] - rng[0]) + rng[0], rng[1], 15)
-    #plt.contour(x, y, np.log10(z[0]), colors = 'r', levels = lvls)
-    for i in range(1, 5):
-        plt.vlines(sts.scoreatpercentile(age1, i * .2 * 100), 0, 14, 'r', linewidth = 2)
-        plt.hlines(sts.scoreatpercentile(age2, i * .2 * 100), 0, 14, 'r', linewidth = 2)
-    firstquintus = sts.scoreatpercentile(age1, 20.)
-    lastquintgao = sts.scoreatpercentile(age2, 80.)
-    print float(len(np.where(np.logical_and(age1 <= firstquintus, age2 > lastquintgao))[0]))
+    plt.contour(x, y, np.log10(z[0]), colors = 'k', levels = lvls)
+    #plot_percentiles(data, numbins, xlim, ylim, vert = True, color = 'k', linestyle = 'solid', linew = 2)
+    #plot_percentiles(age1, 10, plt.xlim(), plt.ylim())
+    #plot_percentiles(age2, 10, plt.xlim(), plt.ylim(), False)
+    xl = plt.xlim()
+    yl = plt.ylim()
+    plot_percentiles(age1, 5, xl, yl, color = 'r')
+    plot_percentiles(age2, 5, xl, yl, False, color = 'r')
     plt.xlabel(lbls[0])
     plt.ylabel(lbls[1])
+    plt.subplot(2, 2, 2)
+    plt.hist(age1, 50, histtype = 'stepfilled')
+    plt.xlim(xl)
+    plt.ylim(plt.ylim())
+    plt.xlabel(lbls[0])
+    plot_percentiles(age1, 5, plt.xlim(), plt.ylim(), color = 'r')
+    plt.subplot(2, 2, 3)
+    plt.hist(age2, 50, histtype = 'stepfilled', orientation = 'horizontal')
+    plt.ylim(yl)
+    plt.xlim(plt.xlim())
+    plt.ylabel(lbls[1])
+    plot_percentiles(age2, 5, plt.xlim(), plt.ylim(), False, color = 'r')
+    firstquintus = sts.scoreatpercentile(age1, 20.)
+    lastquintgao = sts.scoreatpercentile(age2, 80.)
+    print float(len(np.where(np.logical_and(age1 <= firstquintus, age2 >= lastquintgao))[0]))
+    print len(age1)
     plt.show()
     
     
