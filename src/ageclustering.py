@@ -120,7 +120,7 @@ if __name__ == "__main__":
         #Mass Selection masses in number of particles
         massbins = [1056, 1885, 1886, 3352, 3353, 5962, 5963, 10602, 10603, 33528, 33529, 106027, 106028, 80000000000]
         massbin = [1, 0]
-        #Prepare lists to store results
+        #Prepare lists to store results0
         mass_selected_halos = [] #Stores halo tables for mass selected sets
         mass_selected_halos_xi_auto = []
         mass_selected_halos_xi_cross = []
