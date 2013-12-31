@@ -13,11 +13,10 @@ if __name__ == '__main__':
     h = 0.73
     massconv = 6.885e6 #Mass conversion reports mass in M_sun/h
     home = '{0}/'.format(os.environ['HOME'])
-    direc = '{0}Desktop/age-clustering-data/age-clustering attempt 2/z0_attempt1_form_jp/'.format(home)
+    direc = '{0}Desktop/age-clustering-data/attempt1_fof_form_gao/'.format(home)
     ifile = 'properties.dat'
-    agekey = 'Form. Age'
+    agelabel = 'FOF-Root-Form. Age'
     data = readfile('{0}{1}'.format(direc, ifile), col = 28, delim = ' ', skip = 1)
-    print data
     age_bins = 5
     mass_bins = 7
     col_j = ['b', 'c', 'g', 'm', 'r'] #Colors of Age bins that are plotted
@@ -32,7 +31,7 @@ if __name__ == '__main__':
             mass.append(data[4][idx2])
         bias = np.array(bias)
         mass = np.array(mass)
-        plt.semilogx(mass * massconv / h, bias, color = col_j[age_i - 1], label = '{0}_{1}'.format(agekey, age_i))
+        plt.semilogx(mass * massconv / h, bias, color = col_j[age_i - 1], label = '{0}_{1}'.format(agelabel, age_i))
     plt.xlabel('Median Mass [M_sun]')
     plt.ylabel('Bias')
     plt.legend()

@@ -29,14 +29,15 @@ def plot_percentiles(data, numbins, xlim, ylim, vert = True, color = 'k', linest
 
 if __name__ == '__main__':
     home = '{0}/'.format(os.environ['HOME'])
-    direc = '{0}Desktop/age-clustering-data/age-clustering attempt 1/z0_attempt1_form_jp/'.format(home)
-    age_file = 'millenniumIIsnap67age_attempt1057fof_2.txt'
-    agekeys = ['form_jp', 'form_gao']
-    lbls = ['Form. Age', 'Lit. Form. Age']
+    direc = '{0}Desktop/age-clustering-data/'.format(home)
+    age_file = ('attempt1millenniumIIsnap67_1057_fof.txt', 'attempt1millenniumIIsnap67_1057_sub.txt')
+    age_file = age_file[1]
+    agekeys = ['assem_jp', 'assem_gao']
+    lbls = ['Sub-Max_tree-Assem. Age', 'Sub-Root-Assem. Age']
     num_xbins = 30 #Number of bins on x axis. This is used for contour plot.
     num_ybins = 30 #Number of bins on y axis. This is used for contour plot.
     halos = read_halo_table_ascii('{0}{1}'.format(direc, age_file), \
-                                  fmt = 'x,x,x,x,x,x,x,x,x,x,x,x,x,17,x,21,22,23,24,26,28,25,27,29')
+                                  fmt = 'x,x,x,x,x,x,x,x,x,x,x,x,x,17,x,21,22,23,24,27,25,28,26,29')
     print 'File read...Ploting...'
     age1 = np.array(get_col_halo_table(halos, agekeys[0]))
     age2 = np.array(get_col_halo_table(halos, agekeys[1]))
@@ -49,40 +50,19 @@ if __name__ == '__main__':
         for (y_i, yc) in enumerate(ycenters):
             x[x_i][y_i] = xc
             y[x_i][y_i] = yc
-    #idx = np.where(age1 > age2)
-    plt.figure(1)
-    plt.subplot(2,2,4)
-    #plt.plot(age1[idx], age2[idx], '.', color = 'k')
+    idx = np.where(age1 > age2)
+    plt.plot(age1[idx], age2[idx], '*', markersize = 0.9, color = 'k')
     rng = [min(np.reshape(np.log10(z[0]), num_xbins * num_ybins)), max(np.reshape(np.log10(z[0]), num_xbins * num_ybins))]
     if rng[0] == float('-inf'):
-        rng[0] = 0.1
+        rng[0] = 0.0001
     lvls = np.linspace(0.35 * (rng[1] - rng[0]) + rng[0], rng[1], 15)
     plt.contour(x, y, np.log10(z[0]), colors = 'k', levels = lvls)
-    #plot_percentiles(data, numbins, xlim, ylim, vert = True, color = 'k', linestyle = 'solid', linew = 2)
-    #plot_percentiles(age1, 10, plt.xlim(), plt.ylim())
-    #plot_percentiles(age2, 10, plt.xlim(), plt.ylim(), False)
     xl = plt.xlim()
     yl = plt.ylim()
     plot_percentiles(age1, 5, xl, yl, color = 'r')
     plot_percentiles(age2, 5, xl, yl, False, color = 'r')
     plt.xlabel(lbls[0])
     plt.ylabel(lbls[1])
-    plt.subplot(2, 2, 2)
-    plt.hist(age1, 50, histtype = 'stepfilled')
-    plt.xlim(xl)
-    plt.ylim(plt.ylim())
-    plt.xlabel(lbls[0])
-    plot_percentiles(age1, 5, plt.xlim(), plt.ylim(), color = 'r')
-    plt.subplot(2, 2, 3)
-    plt.hist(age2, 50, histtype = 'stepfilled', orientation = 'horizontal')
-    plt.ylim(yl)
-    plt.xlim(plt.xlim())
-    plt.ylabel(lbls[1])
-    plot_percentiles(age2, 5, plt.xlim(), plt.ylim(), False, color = 'r')
-    firstquintus = sts.scoreatpercentile(age1, 20.)
-    lastquintgao = sts.scoreatpercentile(age2, 80.)
-    print float(len(np.where(np.logical_and(age1 <= firstquintus, age2 >= lastquintgao))[0]))
-    print len(age1)
     plt.show()
     
     
