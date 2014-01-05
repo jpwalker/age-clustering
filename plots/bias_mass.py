@@ -5,9 +5,10 @@ Created on Aug 22, 2013
 '''
 
 from IO import *
+import numpy as np
+import compute_nu
 import matplotlib.pyplot as plt
 import os
-import numpy as np
 
 if __name__ == '__main__':
     h = 0.73

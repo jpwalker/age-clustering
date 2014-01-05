@@ -3,6 +3,7 @@
 	<name>age-clustering</name>
 	<comment></comment>
 	<projects>
+		<project>compute_sigma_R</project>
 		<project>MillenniumII</project>
 		<project>simple_ascii_IO</project>
 	</projects>
