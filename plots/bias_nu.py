@@ -6,6 +6,7 @@ Created on Aug 22, 2013
 
 from IO import *
 import numpy as np
+from compute_nu import *
 import matplotlib.pyplot as plt
 from matplotlib import rc
 from matplotlib import rcdefaults
@@ -13,9 +14,13 @@ import os
 
 if __name__ == '__main__':
     h = 0.73
-    massconv = 6.885E6 #Mass conversion reports mass in M_sun/h
+    z = 0 #Update the redshift
+    #Cosmology for MS and MS2
+    cosmo = {'omega_M_0': 0.25, 'omega_lambda_0': 0.75, 'omega_b_0': 0.045, \
+             'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0} 
+    massconv = 6.885e6 #Mass conversion reports mass in M_sun/h
     home = '{0}/'.format(os.environ['HOME'])
-    direc = '{0}Desktop/age-clustering-data/attempt1_FOF_form_gao/'.format(home)
+    direc = '{0}Desktop/age-clustering-data/attempt1_sub_form_gao/'.format(home)
     ifile = 'properties.dat'
     agelabel = 'FOF-Root-Form. Age'
     data = readfile('{0}{1}'.format(direc, ifile), col = 28, delim = ' ', skip = 1)
@@ -33,9 +38,9 @@ if __name__ == '__main__':
             mass.append(data[4][idx2][0])
         bias = np.array(bias)
         mass = np.array(mass)
-        plt.semilogx(mass * massconv / h, bias, color = col_j[age_i - 1], label = '{0}_{1}'.format(agelabel, age_i))
+        plt.plot(compute_nu(mass * massconv / h, z, cosmo), bias, color = col_j[age_i - 1], label = '{0}_{1}'.format(agelabel, age_i))
     rc('text', usetex = True)
-    plt.xlabel('Mass [M$_\\odot$]')
+    plt.xlabel('$\\nu$')
     plt.ylabel('$b$')
     rcdefaults()
     plt.legend()
