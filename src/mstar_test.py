@@ -11,6 +11,7 @@ import MillenniumII as m2
 from subprocess import check_output
 import os
 from collections import namedtuple
+from matplotlib import rc
 
 corr_func = namedtuple('corr_func', ['r', 'cf', 'err', 'RR'])
 
@@ -42,26 +43,36 @@ def read_corr_file(filen):
     data = readfile(filen, 3, ',', skip = 2)
     return create_corr_struct(data[0], data[1], np.zeros(len(data[0])), data[2], num)
     
-def calc_auto_corr(mill_data, outfile, tempfile_addon = ''):
+def calc_auto_corr(mill_data, outfile = '', tempfile_addon = ''):
     curr = '{0}/'.format(os.getcwd())
+    if outfile == '':
+        outfile = '{0}outtemp'.format(curr)
+        wr = False
     temp_file = '{0}temp{1}'.format(curr, tempfile_addon)
     m2.write_halo_table_ascii(temp_file, mill_data, '7,8,9')
     check_output(['2pt-autocorrelation', temp_file, outfile])
     auto_corr = read_corr_file(outfile)
     os.remove(temp_file)
+    if not wr:
+        os.remove(outfile)
     return auto_corr
     
 if __name__ == '__main__':
-    print os.environ['PATH']
     curr = '{0}/'.format(os.getcwd())
     filen = 'Mstar_cat.txt'
-    auto_sample_filen = '{0}autosample'.format(curr)
+    xi_m_m_filen = 'xi_m_m_boylan.txt'
     h = 0.73
     mass_conv = 8.6E8 / h #Converts to Solar Masses 
+    #Read in xi_m_m
+    xi_m_m_corr = read_corr_file(xi_m_m_filen)
+    #Read in sample
     sample = m2.read_halo_table_ascii('{0}{1}'.format(curr, filen), '7,8,9,17')
     print np.median(np.array(m2.get_col_halo_table(sample, 'fof_np')) * mass_conv)
-    sample_corr = calc_auto_corr(sample, auto_sample_filen)
+    sample_corr = calc_auto_corr(sample)
     plt.loglog(sample_corr['data'].r, sample_corr['data'].cf)
+    plt.loglog(xi_m_m_corr['data'].r, xi_m_m_corr['data'].cf)
+    plt.plot(sample_corr['data'].r, sample_corr['data'].cf / xi_m_m_corr['data'].cf)
+    rc('text', usetex = True)
+    plt.xlabel('r [Mpc / h]')
+    plt.ylabel('\\xi(r)')
     plt.show()
-    #Cleanup
-    os.remove(auto_sample_filen)
