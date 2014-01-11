@@ -15,7 +15,7 @@ if __name__ == '__main__':
     h = 0.73
     massconv = 6.885E6 #Mass conversion reports mass in M_sun/h
     home = '{0}/'.format(os.environ['HOME'])
-    direc = '{0}Desktop/age-clustering-data/attempt1_sub_assem_gao/'.format(home)
+    direc = '{0}Desktop/age-clustering-data/snap67/attempt1_fof_form_gao/'.format(home)
     ifile = 'properties.dat'
     agelabel = 'Sub-Root-Assem. Age'
     data = readfile('{0}{1}'.format(direc, ifile), col = 28, delim = ' ', skip = 1)

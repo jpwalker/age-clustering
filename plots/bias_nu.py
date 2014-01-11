@@ -20,7 +20,7 @@ if __name__ == '__main__':
              'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0} 
     massconv = 6.885e6 #Mass conversion reports mass in M_sun/h
     home = '{0}/'.format(os.environ['HOME'])
-    direc = '{0}Desktop/age-clustering-data/attempt1_sub_assem_jp/'.format(home)
+    direc = '{0}Desktop/age-clustering-data/snap67/attempt1_fof_form_jp/'.format(home)
     ifile = 'properties.dat'
     agelabel = 'Sub-Max_tree-Assem. Age'
     data = readfile('{0}{1}'.format(direc, ifile), col = 28, delim = ' ', skip = 1)
