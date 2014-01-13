@@ -50,7 +50,7 @@ def calc_auto_corr(mill_data, outfile = '', tempfile_addon = ''):
         wr = False
     temp_file = '{0}temp{1}'.format(curr, tempfile_addon)
     m2.write_halo_table_ascii(temp_file, mill_data, '7,8,9')
-    check_output(['2pt-autocorrelation', temp_file, outfile])
+    check_output(['2pt-autocorrelation-MS', temp_file, outfile])
     auto_corr = read_corr_file(outfile)
     os.remove(temp_file)
     if not wr:
@@ -71,7 +71,7 @@ if __name__ == '__main__':
     sample_corr = calc_auto_corr(sample)
     plt.loglog(sample_corr['data'].r, sample_corr['data'].cf)
     plt.loglog(xi_m_m_corr['data'].r, xi_m_m_corr['data'].cf)
-    plt.plot(sample_corr['data'].r, sample_corr['data'].cf / xi_m_m_corr['data'].cf)
+    plt.plot(sample_corr['data'].r, np.sqrt(sample_corr['data'].cf / xi_m_m_corr['data'].cf))
     rc('text', usetex = True)
     plt.xlabel('r [Mpc / h]')
     plt.ylabel('\\xi(r)')
