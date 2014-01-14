@@ -56,10 +56,25 @@ def calc_auto_corr(mill_data, outfile = '', tempfile_addon = ''):
     if not wr:
         os.remove(outfile)
     return auto_corr
+
+def check_for_pos_key(key):
+    if not (key == 'x' or key == 'y' or key == 'z'):
+        raise TypeError('Input key: {0} is not valid').format(key)
+
+##function plots Millennium or MillenniumII structures 
+def plot_position_scatter(MS_table, pos_key1 = 'x', pos_key2 = 'y'):
+    check_for_pos_key(pos_key1)
+    check_for_pos_key(pos_key2)
+    pos1 = m2.get_col_halo_table(MS_table, pos_key1)
+    pos2 = m2.get_col_halo_table(MS_table, pos_key2)
+    plt.plot(pos1, pos2, '.', markersize = .95)
+    plt.xlabel('{0} [Mpc / h]'.format(pos_key1))
+    plt.ylabel('{0} [Mpc / h]'.format(pos_key2))
+    plt.show()
     
 if __name__ == '__main__':
     curr = '{0}/'.format(os.getcwd())
-    filen = 'Mstar_cat.txt'
+    filen = 'Mstar_cat2.txt'
     xi_m_m_filen = 'xi_m_m_boylan.txt'
     h = 0.73
     mass_conv = 8.6E8 / h #Converts to Solar Masses 
@@ -67,12 +82,13 @@ if __name__ == '__main__':
     xi_m_m_corr = read_corr_file(xi_m_m_filen)
     #Read in sample
     sample = m2.read_halo_table_ascii('{0}{1}'.format(curr, filen), '7,8,9,17')
+    print 'Plotting position scatter plot of sample file: {0}'.format(filen)
+    plot_position_scatter(sample, 'x', 'y')
     print np.median(np.array(m2.get_col_halo_table(sample, 'fof_np')) * mass_conv)
     sample_corr = calc_auto_corr(sample)
     plt.loglog(sample_corr['data'].r, sample_corr['data'].cf)
     plt.loglog(xi_m_m_corr['data'].r, xi_m_m_corr['data'].cf)
     plt.plot(sample_corr['data'].r, np.sqrt(sample_corr['data'].cf / xi_m_m_corr['data'].cf))
-    rc('text', usetex = True)
     plt.xlabel('r [Mpc / h]')
     plt.ylabel('\\xi(r)')
     plt.show()
