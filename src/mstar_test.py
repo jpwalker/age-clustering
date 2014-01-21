@@ -40,7 +40,7 @@ def cast(d, t):
         
 def read_corr_file(filen):
     num = readfile(filen, 1, skip = 1, numlines = 1)
-    data = readfile(filen, 3, ',', skip = 2)
+    data = readfile(filen, 4, ',', skip = 2)
     return create_corr_struct(data[0], data[1], np.zeros(len(data[0])), data[2], num)
     
 def calc_auto_corr(mill_data, outfile = '', tempfile_addon = ''):
@@ -67,7 +67,7 @@ def plot_position_scatter(MS_table, pos_key1 = 'x', pos_key2 = 'y'):
     check_for_pos_key(pos_key2)
     pos1 = m2.get_col_halo_table(MS_table, pos_key1)
     pos2 = m2.get_col_halo_table(MS_table, pos_key2)
-    plt.plot(pos1, pos2, '.', markersize = .95)
+    plt.plot(pos1, pos2, '*', markersize = .96)
     plt.xlabel('{0} [Mpc / h]'.format(pos_key1))
     plt.ylabel('{0} [Mpc / h]'.format(pos_key2))
     plt.show()
@@ -86,9 +86,11 @@ if __name__ == '__main__':
     plot_position_scatter(sample, 'x', 'y')
     print np.median(np.array(m2.get_col_halo_table(sample, 'fof_np')) * mass_conv)
     sample_corr = calc_auto_corr(sample)
-    plt.loglog(sample_corr['data'].r, sample_corr['data'].cf)
-    plt.loglog(xi_m_m_corr['data'].r, xi_m_m_corr['data'].cf)
+    plt.loglog(sample_corr['data'].r, sample_corr['data'].cf, label = 'sample')
+    plt.loglog(xi_m_m_corr['data'].r, xi_m_m_corr['data'].cf, label = 'xi_m_m')
     plt.plot(sample_corr['data'].r, np.sqrt(sample_corr['data'].cf / xi_m_m_corr['data'].cf))
+    plt.legend()
+    #plt.rc('text', usetex = True)
     plt.xlabel('r [Mpc / h]')
-    plt.ylabel('\\xi(r)')
+    plt.ylabel('$\\xi(r)$')
     plt.show()
