@@ -13,16 +13,17 @@ import os
 from collections import namedtuple
 from matplotlib import rc
 
-corr_func = namedtuple('corr_func', ['r', 'cf', 'err', 'RR'])
+corr_func = namedtuple('corr_func', ['r', 'cf', 'err', 'DD', 'RR'])
 
-def create_corr_struct(r = [], cf = [], err = [], RR = [], num = 0):
-    if len(r) == len(cf) and len(cf) == len(err) and len(err) == len(RR):
+def create_corr_struct(r = [], cf = [], err = [], DD = [], RR = [], num = 0):
+    if len(r) == len(cf) and len(cf) == len(err) and len(err) == len(RR) and len(RR) == len(DD):
         cast(r, 'flt')
         cast(cf, 'flt')
         cast(RR, 'flt')
+        cast(DD, 'flt')
         cast(err, 'flt')
         cast(num, 'int')
-        return {'num': 0, 'data': corr_func(r, cf, err, RR)}
+        return {'num': 0, 'data': corr_func(r, cf, err, DD, RR)}
     else:
         raise TypeError('Input array length mismatch')
 
@@ -41,7 +42,7 @@ def cast(d, t):
 def read_corr_file(filen):
     num = readfile(filen, 1, skip = 1, numlines = 1)
     data = readfile(filen, 4, ',', skip = 2)
-    return create_corr_struct(data[0], data[1], np.zeros(len(data[0])), data[2], num)
+    return create_corr_struct(data[0], data[1], np.zeros(len(data[0])), data[2], data[3], num)
     
 def calc_auto_corr(mill_data, outfile = '', tempfile_addon = ''):
     curr = '{0}/'.format(os.getcwd())
@@ -49,7 +50,7 @@ def calc_auto_corr(mill_data, outfile = '', tempfile_addon = ''):
         outfile = '{0}outtemp'.format(curr)
         wr = False
     temp_file = '{0}temp{1}'.format(curr, tempfile_addon)
-    m2.write_halo_table_ascii(temp_file, mill_data, '7,8,9')
+    m2.write_halo_table_ascii(temp_file, mill_data, fmt = '0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20')
     check_output(['2pt-autocorrelation-MS', temp_file, outfile])
     auto_corr = read_corr_file(outfile)
     os.remove(temp_file)
@@ -57,6 +58,17 @@ def calc_auto_corr(mill_data, outfile = '', tempfile_addon = ''):
         os.remove(outfile)
     return auto_corr
 
+#===============================================================================
+# def calc_cross_corr(mill_data, outfile = '' tempfile_addon = ''):
+#     curr = '{0}/'.format(curr)
+#     if outfile == '':
+#         outfile = '{0}outtemp'.format(curr)
+#         wr = False
+#     temp_file = '{0}temp{1}'.format(curr, tempfile_addon)
+#     m2.write_halo_table_ascii(temp_file, mill_data, '7,8,9')
+#===============================================================================
+    
+    
 def check_for_pos_key(key):
     if not (key == 'x' or key == 'y' or key == 'z'):
         raise TypeError('Input key: {0} is not valid').format(key)
@@ -85,12 +97,13 @@ if __name__ == '__main__':
     print 'Plotting position scatter plot of sample file: {0}'.format(filen)
     plot_position_scatter(sample, 'x', 'y')
     print np.median(np.array(m2.get_col_halo_table(sample, 'fof_np')) * mass_conv)
-    sample_corr = calc_auto_corr(sample)
-    plt.loglog(sample_corr['data'].r, sample_corr['data'].cf, label = 'sample')
-    plt.loglog(xi_m_m_corr['data'].r, xi_m_m_corr['data'].cf, label = 'xi_m_m')
-    plt.plot(sample_corr['data'].r, np.sqrt(sample_corr['data'].cf / xi_m_m_corr['data'].cf))
+    sample_auto_corr = calc_auto_corr(sample)
+    #sample_cross_corr = calc_cross_corr(sample)
+    plt.loglog(sample_auto_corr['data'].r, sample_auto_corr['data'].cf, label = 'sample')
+    plt.loglog(xi_m_m_corr['data'].r, xi_m_m_corr['data'].cf, label = '$\\xi_{mm}$')
+    plt.plot(sample_auto_corr['data'].r, np.sqrt(sample_auto_corr['data'].cf / xi_m_m_corr['data'].cf))
     plt.legend()
-    #plt.rc('text', usetex = True)
+    plt.rc('text', usetex = True)
     plt.xlabel('r [Mpc / h]')
     plt.ylabel('$\\xi(r)$')
     plt.show()
