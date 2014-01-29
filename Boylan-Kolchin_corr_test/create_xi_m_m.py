@@ -10,7 +10,9 @@ Created on Jan 27, 2014
 import sys
 import numpy as np
 from IO import readfile
+from IO import writefile
 from scipy import interpolate as inter
+import matplotlib.pyplot as plt
 from Correlation_Func import create_corr_struct
 
 
@@ -62,6 +64,10 @@ if __name__ == '__main__':
     #Read in old correlation file.
     ##THE FOLLOWING ONLY WORKS WITH BOYLAN-KOLCHIN'S CORREL FILES
     infile_data = readfile(infile, col = 4, delim = ' ', skip = 2)
-    new_cf_func = inter.interp1d(infile_data[0], infile_data[1], 'slinear')
-    new_corr = create_corr_struct(r_new, new_cf_func(r_new), zeros, zeros, zeros, 0)
+    new_cf_func = inter.splrep(infile_data[0], infile_data[1])
+    new_corr = create_corr_struct(r_new, inter.splev(r_new, new_cf_func), zeros, zeros, zeros, 0)
+    plt.loglog(infile_data[0], infile_data[1])
+    plt.loglog(new_corr['data'].r, new_corr['data'].cf, '*')
+    plt.show()
+    writefile(outfile, np.array([new_corr['data'].r, new_corr['data'].cf]), delim = ' ')
     
