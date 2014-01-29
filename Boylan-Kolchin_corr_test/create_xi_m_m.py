@@ -22,6 +22,8 @@ def check_max_min_step(low, high, step):
     else:
         return False
 
+##Basic input for this program are: 
+##infile, outfile, minimum_rad, maximum_rad, step_rad, log_flag 
 if __name__ == '__main__':
     ##Setup and Input Error check
     infile = None
