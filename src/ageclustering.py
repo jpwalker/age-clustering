@@ -12,6 +12,7 @@ from scipy.stats import scoreatpercentile
 from os import mkdir, getcwd
 from subprocess import check_output
 from IO import *
+import Correlation_Func
 
 def mass_sub_select(halos, leftmass, rightmass):
     halos2 = create_halo_table()
