@@ -14,6 +14,7 @@ from IO import writefile
 from scipy import interpolate as inter
 import matplotlib.pyplot as plt
 from Correlation_Func import create_corr_struct
+from Correlation_Func import write_corr_file
 
 
 def check_max_min_step(low, high, step):
@@ -22,6 +23,7 @@ def check_max_min_step(low, high, step):
     else:
         return False
 
+##Program was created to interface Boylan-Kolchin's files with ours
 ##Basic input for this program are: 
 ##infile, outfile, minimum_rad, maximum_rad, step_rad, log_flag 
 if __name__ == '__main__':
@@ -71,5 +73,5 @@ if __name__ == '__main__':
     plt.loglog(infile_data[0], infile_data[1])
     plt.loglog(new_corr['data'].r, new_corr['data'].cf, '*')
     plt.show()
-    writefile(outfile, np.array([new_corr['data'].r, new_corr['data'].cf]), delim = ' ')
-    
+    write_corr_file(outfile, new_corr)
+    print 'File {0} saved.'.format(outfile)
