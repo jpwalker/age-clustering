@@ -12,7 +12,7 @@ from scipy.stats import scoreatpercentile
 from os import mkdir, getcwd
 from subprocess import check_output
 from IO import *
-import Correlation_Func
+from Correlation_Func import *
 
 def mass_sub_select(halos, leftmass, rightmass):
     halos2 = create_halo_table()
@@ -54,12 +54,11 @@ def create_folders(direc):
 def preperations(halos_filename, xi_halos, halos):
     #Calculate the 2pt-auto func. for all halos just read in. This is xi_ML_ML
     print 'Calculating 2pt-autocorrelation function for all halos'
-    write_halo_table_ascii(halos_filename, halos, \
-                           fmt = '0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20')
-    check_output(['2pt-autocorrelation-MS2', halos_filename, xi_halos])
     #Read in correlation function for future use
-    xi_auto_halos = readfile(xi_halos, col = 3, delim = ',', skip = 2)
+    xi_auto_halos = calc_auto_corr(halos, xi_halos, halos_filename, MS2 = True)
     xi_m_m = readfile('{0}xi_m_m.txt'.format(indirec), col = 2, delim = ' ')
+    temp_zero = np.zeros(len(xi_m_m[0]))
+    xi_m_m = create_corr_struct(xi_m_m[0], xi_m_m[1], temp_zero, temp_zero, temp_zero, 0)
     return (xi_auto_halos, xi_m_m)
 
 def calc_bias(xi_cross_filename, xi_m_m, xi_auto_halos, bias_filename):
