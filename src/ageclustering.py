@@ -56,7 +56,7 @@ def preperations(halos_filename, xi_halos, halos):
     print 'Calculating 2pt-autocorrelation function for all halos'
     write_halo_table_ascii(halos_filename, halos, \
                            fmt = '0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20')
-    check_output(['2pt-autocorrelation', halos_filename, xi_halos])
+    check_output(['2pt-autocorrelation-MS2', halos_filename, xi_halos])
     #Read in correlation function for future use
     xi_auto_halos = readfile(xi_halos, col = 3, delim = ',', skip = 2)
     xi_m_m = readfile('{0}xi_m_m.txt'.format(indirec), col = 2, delim = ' ')
@@ -110,7 +110,7 @@ if __name__ == "__main__":
         infile = sys.argv[2]
         #infile = 'millenniumIIsnap67age_attempt1057fof_2.txt'
         fmt = sys.argv[3]
-        #fmt = 'x,x,x,x,x,x,x,7,8,9,x,x,x,17,x,21,22,23,24,25,27,26,28,29'
+        #fmt = 'x,x,x,x,x,x,x,7,8,9,x,x,x,17,x,21,22,23,24,27,25,28,26,29'
         halos = read_halo_table_ascii(indirec + infile, fmt = fmt)
         halos_filename = '{0}halo_table_{1}'.format(indirec, infile)
         xi_halos = '{0}xi_{1}'.format(indirec, infile)
@@ -148,8 +148,8 @@ if __name__ == "__main__":
             xi_auto_filename = '{0}xi_{1}_0.dat'.format(xi_auto_outdirec, mass_i)
             xi_cross_filename = '{0}xi_{1}_0.dat'.format(xi_cross_outdirec, mass_i)
             write_properties(out, currmass_select_halo, agekey, mass_i, 0)
-            check_output(['2pt-autocorrelation', halo_table_filename, xi_auto_filename])
-            check_output(['2pt-crosscorrelation', halo_table_filename, halos_filename, xi_cross_filename])
+            check_output(['2pt-autocorrelation-MS2', halo_table_filename, xi_auto_filename])
+            check_output(['2pt-crosscorrelation-MS2', halo_table_filename, halos_filename, xi_cross_filename])
             b = calc_bias(xi_cross_filename, xi_m_m, xi_auto_halos, '{0}bias_{1}_0'.format(bias_direc, mass_i))
             print '{0} halos with {1} <= M < {2} M_Sun'.format(currmass_select_halo['length'], \
                                                            log10(massbin[0] * massconv), \
@@ -175,8 +175,8 @@ if __name__ == "__main__":
                                    fmt = '0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20')
                 xi_auto_filename = '{0}xi_{1}_{2}.dat'.format(xi_auto_outdirec, mass_i, age_i)
                 xi_cross_filename = '{0}xi_{1}_{2}.dat'.format(xi_cross_outdirec, mass_i, age_i)
-                check_output(['2pt-autocorrelation', halo_table_filename, xi_auto_filename])
-                check_output(['2pt-crosscorrelation', halo_table_filename, halos_filename, xi_cross_filename])
+                check_output(['2pt-autocorrelation-MS2', halo_table_filename, xi_auto_filename])
+                check_output(['2pt-crosscorrelation-MS2', halo_table_filename, halos_filename, xi_cross_filename])
                 b = calc_bias(xi_cross_filename, xi_m_m, xi_auto_halos, '{0}bias_{1}_{2}'.format(bias_direc, mass_i, age_i))
                 write_properties(out, currage_select_halo, agekey, mass_i, age_i)
                 testnum += currage_select_halo['length']
@@ -204,8 +204,8 @@ if __name__ == "__main__":
             xi_auto_filename = '{0}xi_0_{1}.dat'.format(xi_auto_outdirec, age_i)
             xi_cross_filename = '{0}xi_0_{1}.dat'.format(xi_cross_outdirec, age_i)
             bias_filename = '{0}bias_0_{1}'.format(bias_direc, age_i)
-            check_output(['2pt-autocorrelation', out_halo_name, xi_auto_filename])
-            check_output(['2pt-crosscorrelation', out_halo_name, halos_filename, xi_cross_filename])
+            check_output(['2pt-autocorrelation-MS2', out_halo_name, xi_auto_filename])
+            check_output(['2pt-crosscorrelation-MS2', out_halo_name, halos_filename, xi_cross_filename])
             calc_bias(xi_cross_filename, xi_m_m, xi_auto_halos, bias_filename)
             testnum += selected_halos['length']
             #Redefine the low_age for next pass
