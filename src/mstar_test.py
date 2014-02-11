@@ -14,7 +14,7 @@ import Standard_Plots as sp
 if __name__ == '__main__':
     curr = '{0}/'.format(os.getcwd())
     filen = 'Mstar_cat_snap31-MS2.txt'
-    xi_m_m_filen = 'xi_m_m_67.txt'
+    xi_m_m_filen = 'xi_m_m_36.txt'
     h = 0.73
     mass_conv = 6.9E6 / h #Converts to Solar Masses 
     #Read in xi_m_m
