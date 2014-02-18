@@ -96,7 +96,7 @@ def write_properties(filestr, halos, agekey, mass_i, age_i):
                                    str(max(get_col_halo_table(halos, agekey)))])))
 
 if __name__ == "__main__":
-    if len(sys.argv) == 5:
+    if len(sys.argv) == 4:
         h = 0.73
         massconv = 6.885e6 / h
         num_mass_bins = 7
