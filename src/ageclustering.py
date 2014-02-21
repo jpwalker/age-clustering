@@ -60,7 +60,7 @@ def preperations(halos_filename, xi_halos, halos):
     return (xi_auto_halos, xi_m_m)
 
 def calc_bias(xi_cross, xi_m_m, xi_auto_halos, bias_filename):
-    if xi_cross['data'].r == xi_m_m['data'].r and xi_m_m['data'].r == xi_auto_halos['data'].r:
+    if (xi_cross['data'].r == xi_m_m['data'].r).all() and (xi_m_m['data'].r == xi_auto_halos['data'].r).all():
         bias = np.array([xi_cross['data'].r, xi_cross['data'].cf / np.sqrt(xi_m_m['data'].cf * \
                                                                            xi_auto_halos['data'].cf)])
     else:
