@@ -57,4 +57,3 @@ if __name__ == '__main__':
     rcdefaults()
     plt.legend()
     plt.show()
-    plt.show()
