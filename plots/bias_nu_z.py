@@ -24,8 +24,8 @@ def plot_seljak_warren(M_low, M_high, cosmo):
 
 if __name__ == '__main__':
     h = 0.73
-    snap_dirs = ('snap22', 'snap36', 'snap67')
-    z = (6.7115707, 2.0700316, 0) #Update the redshift
+    snap_dirs = ('snap22', 'snap27', 'snap36', 'snap45', 'snap67')
+    z = (6.196857, 4.179475, 2.0700316, 0.98870987, 0) #Update the redshift
     #Cosmology for MS and MS2
     cosmo = {'omega_M_0': 0.25, 'omega_lambda_0': 0.75, 'omega_b_0': 0.045, \
              'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0} 
@@ -46,7 +46,7 @@ if __name__ == '__main__':
             mass = []
             for mass_i in range(1, mass_bins + 1):
                 b_data = readfile('{0}bias/bias_{1}_{2}'.format(direc, mass_i, age_i), col = 2, delim = ',', skip = 1)
-                idx1 = np.where(np.logical_and(b_data[0] >= 5, b_data[0] <= 25))[0]
+                idx1 = np.where(np.logical_and(b_data[0] >= 5, b_data[0] <= 15))[0]
                 idx2 = np.where(np.logical_and(data[0] == mass_i, data[1] == age_i))[0]
                 bias.append(np.sum(b_data[1][idx1]) / len(b_data[1][idx1]))
                 mass.append(data[4][idx2][0])

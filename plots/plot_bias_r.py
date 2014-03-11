@@ -14,7 +14,7 @@ massconv = 6.885e6 #Mass conversion reports mass in M_sun
 #Read in the matter matter 2pt-autocorrelation function
 xi_m_m = readfile('{0}xi_m_m.txt'.format(direc), col = 2, delim = ' ')
 #Read in the properties file were mass and age properties are stored.
-prop = readfile('{0}properties.dat'.format(direc), col = 28, delim = ' ', skip = 1)
+prop = readfile('{0}properties.dat'.format(direc), col = 28, delim = '    ', skip = 1)
 plt.figure(1)
 temp1 = 3
 temp2 = 3
