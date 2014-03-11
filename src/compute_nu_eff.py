@@ -42,7 +42,8 @@ def calc_bias(direc, mass_i, age_i):
     return np.sum(b_data[1][idx1]) / len(b_data[1][idx1])
 
 def nu_eff(finaldir, age_i, age_label, massbins, cosmo, z):
-    mass_conv = 6.8e6 / .73
+    h = 0.73
+    mass_conv = 6.8e6
     propfile = 'properties.dat'
     home = '{0}/'.format(os.environ['HOME'])
     curr_age_dir = '{0}/Desktop/age-clustering-data/{1}'.format(home, finaldir)
