@@ -1,8 +1,8 @@
 This is the current format string for reading and writing files.
-This string will read/write fof_np, max_mass, max_mass_snap, 
+This string will read/write x, y, z, fof_np, max_mass, max_mass_snap, 
 min_mass_root_max, min_mass_root_max_snap, form_jp, form_gao,
 assem_jp, assem_gao, merg
 
 Add other things as necessary for reading and writing files.
 
-x,x,x,x,x,x,x,x,x,x,x,x,x,17,x,21,22,23,24,27,25,28,26,29
+x,x,x,x,x,x,x,7,8,9,x,x,x,17,x,21,22,23,24,27,25,28,26,29

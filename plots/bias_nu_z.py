@@ -13,7 +13,7 @@ from matplotlib import rcdefaults
 import os
 
 def plot_seljak_warren(M_low, M_high, cosmo):
-    M = np.logspace(M_low, M_high, 10000)
+    M = np.logspace(M_low, M_high, 1000)
     M_star = compute_Mstar(0, cosmo)
     x = M * 1.5 / M_star
     b = 0.53 + 0.39 * x**0.45 + 0.13 / (40 * x + 1) + 5E-4 * x**1.5 + np.log10(x) * \
@@ -24,8 +24,8 @@ def plot_seljak_warren(M_low, M_high, cosmo):
 
 if __name__ == '__main__':
     h = 0.73
-    snap_dirs = ('snap22', 'snap27', 'snap36', 'snap45', 'snap67')
-    z = (6.196857, 4.179475, 2.0700316, 0.98870987, 0) #Update the redshift
+    snap_dirs = ['snap22', 'snap27', 'snap36', 'snap45', 'snap67']
+    z = [6.196857, 4.179475, 2.0700316, 0.98870987, 0] #Update the redshift
     #Cosmology for MS and MS2
     cosmo = {'omega_M_0': 0.25, 'omega_lambda_0': 0.75, 'omega_b_0': 0.045, \
              'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0} 
@@ -33,13 +33,13 @@ if __name__ == '__main__':
     home = '{0}/'.format(os.environ['HOME'])
     (nu, b) = plot_seljak_warren(10, 15.45, cosmo)
     plt.plot(nu, b, 'k--')
+    age_bins = 5
+    mass_bins = 7
+    ifile = 'properties.dat'
+    agelabel = 'Sub-Max_tree-Form. Age'
     for (i, s) in enumerate(snap_dirs):
         direc = '{0}Desktop/age-clustering-data/{1}/attempt1_sub_form_gao/'.format(home, s)
-        ifile = 'properties.dat'
-        agelabel = 'Sub-Max_tree-Form. Age'
         data = readfile('{0}{1}'.format(direc, ifile), col = 28, delim = '    ', skip = 1)
-        age_bins = 5
-        mass_bins = 7
         col_j = ['k', 'b', 'c', 'g', 'm', 'r'] #Colors of Age bins that are plotted
         for age_i in range(0, age_bins + 1):
             bias = []
