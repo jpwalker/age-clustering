@@ -30,12 +30,13 @@ def calc_nu_eff(nu, bias, nu_med, bias_med):
 
 def calc_seljak_warren(num, cosmo):
     M_low = 9
-    M_high = 15
+    M_high = 16
     M = np.logspace(M_low, M_high, num)
     M_star = n.compute_Mstar(0, cosmo)
     x = M * 1.5 / M_star
-    b = 0.53 + 0.39 * x**0.45 + 0.13 / (40 * x + 1) + 5E-4 * x**1.5 + np.log10(x) * \
-    (0.4 * (cosmo['omega_M_0'] - 0.3 + cosmo['n'] - 1) + 0.3 * (cosmo['sigma_8'] - 0.9 + cosmo['h'] -.7))
+    b = 0.53 + 0.39 * x ** 0.45 + 0.13 / (40. * x + 1.) + 5E-4 * x ** 1.5 
+    #b = 0.53 + 0.39 * x**0.45 + 0.13 / (40 * x + 1) + 5E-4 * x**1.5 + np.log10(x) * \
+    #(0.4 * (cosmo['omega_M_0'] - 0.3 + cosmo['n'] - 1) + 0.3 * (cosmo['sigma_8'] - 0.9 + cosmo['h'] -.7)) ##modified Seljak and Warren
     nu = n.compute_nu(M, 0, cosmo)
     return (nu, b)
 
@@ -52,7 +53,7 @@ def nu_eff(finaldir, age_i, massbins, cosmo, z):
     ##Read in Properties file
     data = readfile('{0}{1}'.format(finaldir, propfile), col = 28, delim = '    ', skip = 1)
     (nu_no_age, bias_no_age)  = calc_seljak_warren(1000, cosmo)
-    ret_array = [[], [], [], []]
+    ret_array = [[], [], [], [], [], []]
     for mass_i in range(1, massbins + 1):
         idx1 = np.where(np.logical_and(data[0] == mass_i, data[1] == 0))[0]
         median_age_no_age = data[25][idx1][0] ##Median age without age selection in one mass bin
@@ -63,17 +64,15 @@ def nu_eff(finaldir, age_i, massbins, cosmo, z):
         bias_age = calc_bias(finaldir, mass_i, age_i)
         nu_ef = calc_nu_eff(nu_age, bias_age, nu_no_age, bias_no_age)
         if nu_ef != None:
-            ret_array[0].append(nu_age) ##nu of age-mass selection
-            ret_array[1].append(bias_age) ## bias of age-mass selection
-            ret_array[2].append(nu_ef) ##nu-eff for age-mass
-            ret_array[3].append(med_age / median_age_no_age)
-    ret_array[0] = np.array(ret_array[0])
-    ret_array[1] = np.array(ret_array[1])
-    ret_array[2] = np.array(ret_array[2])
-    ret_array[3] = np.array(ret_array[3])
-    return (ret_array[0], ret_array[1], ret_array[2], ret_array[3])
-        
-        
+            ret_array[0].append(mass_i)
+            ret_array[1].append(age_i)
+            ret_array[2].append(nu_age) ##nu of age-mass selection
+            ret_array[3].append(bias_age) ## bias of age-mass selection
+            ret_array[4].append(nu_ef) ##nu-eff for age-mass
+            ret_array[5].append(med_age)# / median_age_no_age)
+    for i in range(6):
+        ret_array[i] = np.array(ret_array[i])
+    return (ret_array[0], ret_array[1], ret_array[2], ret_array[3], ret_array[4], ret_array[5])
          
 if __name__ == '__main__':
     cosmo = {'omega_M_0': 0.25, 'omega_lambda_0': 0.75, 'omega_b_0': 0.045, \
@@ -85,7 +84,7 @@ if __name__ == '__main__':
     col_j = ['k', 'b', 'c', 'g', 'm', 'r'] ##Predefined colors for age_i
     (nu_no_age, bias_no_age)  = calc_seljak_warren(1000, cosmo)
     nu_res = []
-    for age_i in range(0,6):
+    for age_i in range(1,6):
         nu_res.append(nu_eff(finaldir, age_i, 7, cosmo, z))
 #         plt.plot(nu_no_age, bias_no_age, 'k')
 #         plt.plot(nu_res[-1][0], nu_res[-1][1], color = col_j[age_i], 
@@ -93,9 +92,13 @@ if __name__ == '__main__':
 #         plt.hlines(nu_res[-1][1], nu_res[-1][0], nu_res[-1][2])
 #         plt.vlines(nu_res[-1][0], plt.ylim()[0], plt.ylim()[1])
 #         plt.vlines(nu_res[-1][2], plt.ylim()[0], plt.ylim()[1])
-        plt.plot(nu_res[-1][3], nu_res[-1][0] / nu_res[-1][2], '+',
+        x = nu_res[-1][2]
+        y = nu_res[-1][4]# - nu_res[-1][2]
+        plt.plot(x, y, '+',
                  color = col_j[age_i], label = '{0}_{1}'.format(agelabel, age_i))
-    plt.xlabel('age / <age>')
-    plt.ylabel('nu / nu_eff')
+        for (i, txt) in enumerate(nu_res[-1][0]):
+            plt.text(x[i], y[i], txt)
+    plt.xlabel('nu')
+    plt.ylabel('nu_eff')
     plt.legend()
     plt.show()
