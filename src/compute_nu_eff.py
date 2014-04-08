@@ -9,6 +9,7 @@ import compute_nu as n
 import os
 from IO import readfile
 import scipy.interpolate as inter
+from scipy.stats import linregress
 import matplotlib.pyplot as plt
 
 def calc_nu_eff(nu, bias, nu_med, bias_med):
@@ -77,27 +78,40 @@ def nu_eff(finaldir, age_i, massbins, cosmo, z):
 if __name__ == '__main__':
     cosmo = {'omega_M_0': 0.25, 'omega_lambda_0': 0.75, 'omega_b_0': 0.045, \
              'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0} # INPUT
-    z =  2.0700316 #INPUT
+    zs =  [6.196857, 4.179475, 2.0700316, 0.98870987, 0] #INPUT
     home = '{0}/'.format(os.environ['HOME'])
-    finaldir = '{0}Desktop/age-clustering-data/snap36/attempt1_sub_form_gao/'.format(home) ##INPUT
-    agelabel = 'Sub-Root-Form. Age' ##INPUT
-    col_j = ['k', 'b', 'c', 'g', 'm', 'r'] ##Predefined colors for age_i
-    (nu_no_age, bias_no_age)  = calc_seljak_warren(1000, cosmo)
-    nu_res = []
-    for age_i in range(1,6):
-        nu_res.append(nu_eff(finaldir, age_i, 7, cosmo, z))
+    snaps = [22, 27, 36, 45, 67]
+    xtot = []
+    ytot = []
+    for (t, s) in enumerate(snaps):
+        z = zs[t]
+        finaldir = '{0}Desktop/age-clustering-data/snap{1}/attempt1_sub_form_gao/'.format(home, s) ##INPUT
+        agelabel = 'Sub-Root-Form. Age' ##INPUT
+        col_j = ['k', 'b', 'c', 'g', 'm', 'r'] ##Predefined colors for age_i
+        (nu_no_age, bias_no_age)  = calc_seljak_warren(1000, cosmo)
+        nu_res = []
+        for age_i in range(5,6):
+            nu_res.append(nu_eff(finaldir, age_i, 7, cosmo, z))
 #         plt.plot(nu_no_age, bias_no_age, 'k')
 #         plt.plot(nu_res[-1][0], nu_res[-1][1], color = col_j[age_i], 
 #                  label = '{0}_{1}'.format(agelabel, age_i))
 #         plt.hlines(nu_res[-1][1], nu_res[-1][0], nu_res[-1][2])
 #         plt.vlines(nu_res[-1][0], plt.ylim()[0], plt.ylim()[1])
 #         plt.vlines(nu_res[-1][2], plt.ylim()[0], plt.ylim()[1])
-        x = nu_res[-1][2]
-        y = nu_res[-1][4]# - nu_res[-1][2]
-        plt.plot(x, y, '+',
-                 color = col_j[age_i], label = '{0}_{1}'.format(agelabel, age_i))
-        for (i, txt) in enumerate(nu_res[-1][0]):
-            plt.text(x[i], y[i], txt)
+            x = nu_res[-1][2]
+            y = nu_res[-1][4]# - nu_res[-1][2]
+            xtot.extend(x)
+            ytot.extend(y)
+            txt = nu_res[-1][0]
+            plt.plot(x, y, '+',
+                 color = col_j[age_i], label = '{0}_{1}_{2}'.format(agelabel, s, age_i))
+            for (i, txt) in enumerate(nu_res[-1][0]):
+                plt.text(x[i], y[i], txt)
+    xtot = np.array(xtot)
+    ytot = np.array(ytot)
+    (slope, intercept, rval, pval, stderr) = linregress(xtot, ytot)
+    plt.plot(xtot, xtot * slope + intercept , 'r')
+    plt.plot([0, 10], [0, 10], '--k')
     plt.xlabel('nu')
     plt.ylabel('nu_eff')
     plt.legend()
