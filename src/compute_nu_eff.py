@@ -73,7 +73,7 @@ def nu_eff(finaldir, age_i, massbins, cosmo, z):
             ret_array[5].append(med_age)# / median_age_no_age)
     for i in range(6):
         ret_array[i] = np.array(ret_array[i])
-    return (ret_array[0], ret_array[1], ret_array[2], ret_array[3], ret_array[4], ret_array[5])
+    return (ret_array[0], ret_array[1], ret_array[2], ret_array[3], ret_array[4], ret_array[5], median_age_no_age)
          
 if __name__ == '__main__':
     cosmo = {'omega_M_0': 0.25, 'omega_lambda_0': 0.75, 'omega_b_0': 0.045, \
