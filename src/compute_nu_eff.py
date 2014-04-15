@@ -85,12 +85,12 @@ if __name__ == '__main__':
     ytot = []
     for (t, s) in enumerate(snaps):
         z = zs[t]
-        finaldir = '{0}Desktop/age-clustering-data/snap{1}/attempt1_sub_form_gao/'.format(home, s) ##INPUT
+        finaldir = '{0}Desktop/age-clustering-data/snap{1}/attempt1_sub_form_jp/'.format(home, s) ##INPUT
         agelabel = 'Sub-Root-Form. Age' ##INPUT
         col_j = ['k', 'b', 'c', 'g', 'm', 'r'] ##Predefined colors for age_i
         (nu_no_age, bias_no_age)  = calc_seljak_warren(1000, cosmo)
         nu_res = []
-        for age_i in range(5,6):
+        for age_i in range(1,6):
             nu_res.append(nu_eff(finaldir, age_i, 7, cosmo, z))
 #         plt.plot(nu_no_age, bias_no_age, 'k')
 #         plt.plot(nu_res[-1][0], nu_res[-1][1], color = col_j[age_i], 
@@ -98,8 +98,8 @@ if __name__ == '__main__':
 #         plt.hlines(nu_res[-1][1], nu_res[-1][0], nu_res[-1][2])
 #         plt.vlines(nu_res[-1][0], plt.ylim()[0], plt.ylim()[1])
 #         plt.vlines(nu_res[-1][2], plt.ylim()[0], plt.ylim()[1])
-            x = nu_res[-1][2]
-            y = nu_res[-1][4]# - nu_res[-1][2]
+            x = nu_res[-1][2]#nu_res[-1][5] / nu_res[-1][6]
+            y = (nu_res[-1][4] - nu_res[-1][2]) / nu_res[-1][2] # - nu_res[-1][2]
             xtot.extend(x)
             ytot.extend(y)
             txt = nu_res[-1][0]
@@ -109,10 +109,10 @@ if __name__ == '__main__':
                 plt.text(x[i], y[i], txt)
     xtot = np.array(xtot)
     ytot = np.array(ytot)
-    (slope, intercept, rval, pval, stderr) = linregress(xtot, ytot)
-    plt.plot(xtot, xtot * slope + intercept , 'r')
-    plt.plot([0, 10], [0, 10], '--k')
+    #(slope, intercept, rval, pval, stderr) = linregress(xtot, ytot)
+    #plt.plot(xtot, xtot * slope + intercept , 'r')
+    #plt.plot([0, 0], [10, 0], '--k')
     plt.xlabel('nu')
-    plt.ylabel('nu_eff')
-    plt.legend()
+    plt.ylabel('(nu_eff - nu)  / nu')
+    #plt.legend()
     plt.show()
