@@ -47,17 +47,14 @@ def calc_bias(direc, mass_i, age_i):
     idx1 = np.where(np.logical_and(b_data[0] >= 5, b_data[0] <= 15))[0]
     return np.sum(b_data[1][idx1]) / len(b_data[1][idx1])
 
-def nu_eff(finaldir, age_i, massbins, cosmo, z):
+def nu_eff(finaldir, age_i, massbins, cosmo, z, nu_no_age, bias_no_age):
     h = 0.73
     mass_conv = 6.8e6
     propfile = 'properties.dat'
     ##Read in Properties file
     data = readfile('{0}{1}'.format(finaldir, propfile), col = 28, delim = '    ', skip = 1)
-    (nu_no_age, bias_no_age)  = calc_seljak_warren(1000, cosmo)
     ret_array = [[], [], [], [], [], []]
     for mass_i in range(1, massbins + 1):
-        idx1 = np.where(np.logical_and(data[0] == mass_i, data[1] == 0))[0]
-        median_age_no_age = data[25][idx1][0] ##Median age without age selection in one mass bin
         idx2 = np.where(np.logical_and(data[0] == mass_i, data[1] == age_i))[0]
         med_age = data[25][idx2][0] ##median age of mass-age selection
         med_mass = data[4][idx2][0] ##median mass of mass bin 
@@ -73,7 +70,7 @@ def nu_eff(finaldir, age_i, massbins, cosmo, z):
             ret_array[5].append(med_age)# / median_age_no_age)
     for i in range(6):
         ret_array[i] = np.array(ret_array[i])
-    return (ret_array[0], ret_array[1], ret_array[2], ret_array[3], ret_array[4], ret_array[5], median_age_no_age)
+    return (ret_array[0], ret_array[1], ret_array[2], ret_array[3], ret_array[4], ret_array[5])
          
 if __name__ == '__main__':
     cosmo = {'omega_M_0': 0.25, 'omega_lambda_0': 0.75, 'omega_b_0': 0.045, \
@@ -83,32 +80,37 @@ if __name__ == '__main__':
     snaps = [22, 27, 36, 45, 67]
     xtot = []
     ytot = []
+    (nu_no_age, bias_no_age)  = calc_seljak_warren(1000, cosmo)
     for (t, s) in enumerate(snaps):
         z = zs[t]
         finaldir = '{0}Desktop/age-clustering-data/snap{1}/attempt1_sub_form_jp/'.format(home, s) ##INPUT
         agelabel = 'Sub-Root-Form. Age' ##INPUT
         col_j = ['k', 'b', 'c', 'g', 'm', 'r'] ##Predefined colors for age_i
-        (nu_no_age, bias_no_age)  = calc_seljak_warren(1000, cosmo)
+        
         nu_res = []
-        for age_i in range(1,6):
-            nu_res.append(nu_eff(finaldir, age_i, 7, cosmo, z))
-#         plt.plot(nu_no_age, bias_no_age, 'k')
-#         plt.plot(nu_res[-1][0], nu_res[-1][1], color = col_j[age_i], 
-#                  label = '{0}_{1}'.format(agelabel, age_i))
-#         plt.hlines(nu_res[-1][1], nu_res[-1][0], nu_res[-1][2])
-#         plt.vlines(nu_res[-1][0], plt.ylim()[0], plt.ylim()[1])
-#         plt.vlines(nu_res[-1][2], plt.ylim()[0], plt.ylim()[1])
-            x = nu_res[-1][2]#nu_res[-1][5] / nu_res[-1][6]
-            y = (nu_res[-1][4] - nu_res[-1][2]) / nu_res[-1][2] # - nu_res[-1][2]
-            xtot.extend(x)
-            ytot.extend(y)
-            txt = nu_res[-1][0]
-            plt.plot(x, y, '+',
-                 color = col_j[age_i], label = '{0}_{1}_{2}'.format(agelabel, s, age_i))
-            for (i, txt) in enumerate(nu_res[-1][0]):
-                plt.text(x[i], y[i], txt)
-    xtot = np.array(xtot)
-    ytot = np.array(ytot)
+        for age_i in range(0,6):
+            x = np.array([])
+            if age_i == 0:
+                temp = nu_eff(finaldir, age_i, 7, cosmo, z, nu_no_age, bias_no_age)
+                median_age = temp[5]
+                mass_i_median_age = temp[0]
+            else:
+                nu_res.append(nu_eff(finaldir, age_i, 7, cosmo, z, nu_no_age, bias_no_age))
+                print nu_res[-1][5]
+                print median_age
+                for (idx, x_temp) in enumerate(nu_res[-1][5]):
+                    idx2 = np.where(mass_i_median_age == nu_res[-1][0][idx])[0]
+                    x = np.append(x, x_temp / median_age[idx2]) #nu_res[-1][2] 
+                y = (nu_res[-1][4] - nu_res[-1][2]) / nu_res[-1][2] # - nu_res[-1][2]
+                xtot.extend(x)
+                ytot.extend(y)
+                txt = nu_res[-1][0]
+                plt.plot(x, y, '+', 
+                         color = col_j[age_i], label = '{0}_{1}_{2}'.format(agelabel, s, age_i))
+                for (i, txt) in enumerate(nu_res[-1][0]):
+                    plt.text(x[i], y[i], txt)
+    #xtot = np.array(xtot)
+    #ytot = np.array(ytot)
     #(slope, intercept, rval, pval, stderr) = linregress(xtot, ytot)
     #plt.plot(xtot, xtot * slope + intercept , 'r')
     #plt.plot([0, 0], [10, 0], '--k')
