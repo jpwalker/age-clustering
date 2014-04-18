@@ -61,7 +61,8 @@ def nu_eff(finaldir, age_i, massbins, cosmo, z, nu_no_age, bias_no_age):
         nu_age = n.compute_nu(med_mass * mass_conv / h, z, cosmo)
         bias_age = calc_bias(finaldir, mass_i, age_i)
         nu_ef = calc_nu_eff(nu_age, bias_age, nu_no_age, bias_no_age)
-        #if nu_ef != None:
+        if nu_ef != None:
+            nu_ef = -10000
         ret_array[0].append(mass_i)
         ret_array[1].append(age_i)
         ret_array[2].append(nu_age) ##nu of age-mass selection
