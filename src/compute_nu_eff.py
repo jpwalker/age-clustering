@@ -101,7 +101,7 @@ if __name__ == '__main__':
                 for (idx, x_temp) in enumerate(nu_res[-1][5]):
                     idx2 = np.where(mass_i_median_age == nu_res[-1][0][idx])[0]
                     x = np.append(x, x_temp / median_age[idx2]) #nu_res[-1][2] 
-                y = (nu_res[-1][4] - nu_res[-1][2]) / nu_res[-1][2] # - nu_res[-1][2]
+                    y = (nu_res[-1][4] - nu_res[-1][2]) / nu_res[-1][2] # - nu_res[-1][2]
                 xtot.extend(x)
                 ytot.extend(y)
                 txt = nu_res[-1][0]
