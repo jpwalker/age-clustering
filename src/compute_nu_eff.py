@@ -53,22 +53,22 @@ def nu_eff(finaldir, age_i, massbins, cosmo, z, nu_no_age, bias_no_age):
     propfile = 'properties.dat'
     ##Read in Properties file
     data = readfile('{0}{1}'.format(finaldir, propfile), col = 28, delim = '    ', skip = 1)
-    ret_array = [[], [], [], [], [], []]
+    ret_array = np.array([[],[],[],[],[],[]])
     for mass_i in range(1, massbins + 1):
         idx2 = np.where(np.logical_and(data[0] == mass_i, data[1] == age_i))[0]
         med_age = data[25][idx2][0] ##median age of mass-age selection
         med_mass = data[4][idx2][0] ##median mass of mass bin 
-        nu_age = n.compute_nu(med_mass * mass_conv / h, z, cosmo)
-        bias_age = calc_bias(finaldir, mass_i, age_i)
-        nu_ef = calc_nu_eff(nu_age, bias_age, nu_no_age, bias_no_age)
+        nu_age = n.compute_nu(med_mass * mass_conv / h, z, cosmo) #Calculate nu for the median  mass
+        bias_age = calc_bias(finaldir, mass_i, age_i) #Calculate bias from crosscorrelations 
+        nu_ef = calc_nu_eff(nu_age, bias_age, nu_no_age, bias_no_age) #Calculate nu effective based on nu and bias(nu) without age
         if nu_ef != None:
-            nu_ef = -10000
+            nu_ef = -100000 #If nu effective is not found then it is set to a large negative number 
         ret_array[0].append(mass_i)
         ret_array[1].append(age_i)
-        ret_array[2].append(nu_age) ##nu of age-mass selection
-        ret_array[3].append(bias_age) ## bias of age-mass selection
-        ret_array[4].append(nu_ef) ##nu-eff for age-mass
-        ret_array[5].append(med_age)# / median_age_no_age)
+        ret_array[2].append(nu_age) # nu of age-mass selection
+        ret_array[3].append(bias_age) # bias for age-mass selection
+        ret_array[4].append(nu_ef) # nu-eff for age-mass
+        ret_array[5].append(med_age)# median age for age-mass
     for i in range(6):
         ret_array[i] = np.array(ret_array[i])
     return (ret_array[0], ret_array[1], ret_array[2], ret_array[3], ret_array[4], ret_array[5])
