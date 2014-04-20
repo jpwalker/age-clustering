@@ -61,7 +61,7 @@ def nu_eff(finaldir, age_i, massbins, cosmo, z, nu_no_age, bias_no_age):
         nu_age = n.compute_nu(med_mass * mass_conv / h, z, cosmo) #Calculate nu for the median  mass
         bias_age = calc_bias(finaldir, mass_i, age_i) #Calculate bias from crosscorrelations 
         nu_ef = calc_nu_eff(nu_age, bias_age, nu_no_age, bias_no_age) #Calculate nu effective based on nu and bias(nu) without age
-        if nu_ef != None:
+        if nu_ef == None:
             nu_ef = -100000 #If nu effective is not found then it is set to a large negative number 
         ret_array[0].append(mass_i)
         ret_array[1].append(age_i)
@@ -84,38 +84,39 @@ if __name__ == '__main__':
     (nu_no_age, bias_no_age)  = calc_seljak_warren(1000, cosmo)
     for (t, s) in enumerate(snaps):
         z = zs[t]
-        finaldir = '{0}Desktop/age-clustering-data/snap{1}/attempt1_sub_form_jp/'.format(home, s) ##INPUT
+        finaldir = '{0}Desktop/age-clustering-data/snap{1}/attempt1_sub_form_gao/'.format(home, s) ##INPUT
         agelabel = 'Sub-Root-Form. Age' ##INPUT
         col_j = ['k', 'b', 'c', 'g', 'm', 'r'] ##Predefined colors for age_i
         
         nu_res = []
         for age_i in range(0,6):
             x = np.array([])
+            y = np.array([])
+            txt = np.array([],dtype = int)
             if age_i == 0:
                 temp = nu_eff(finaldir, age_i, 7, cosmo, z, nu_no_age, bias_no_age)
                 median_age = temp[5]
                 mass_i_median_age = temp[0]
             else:
                 nu_res.append(nu_eff(finaldir, age_i, 7, cosmo, z, nu_no_age, bias_no_age))
-                print nu_res[-1][5]
-                print median_age
                 for (idx, x_temp) in enumerate(nu_res[-1][5]):
-                    idx2 = np.where(mass_i_median_age == nu_res[-1][0][idx])[0]
-                    x = np.append(x, x_temp / median_age[idx2]) 
-                y = (nu_res[-1][4] - nu_res[-1][2]) / nu_res[-1][2]    
+                    if nu_res[-1][4][idx] > -100:
+                        idx2 = np.where(mass_i_median_age == nu_res[-1][0][idx])[0]
+                        x = np.append(x, nu_res[-1][2][idx])#x_temp / median_age[idx2]) 
+                        y = np.append(y, (nu_res[-1][4][idx] - nu_res[-1][2][idx]) / nu_res[-1][2][idx])
+                        txt = np.append(txt, nu_res[-1][0][idx])    
                 xtot.extend(x)
                 ytot.extend(y)
-                txt = nu_res[-1][0]
                 plt.plot(x, y, '+', 
                          color = col_j[age_i], label = '{0}_{1}_{2}'.format(agelabel, s, age_i))
-                for (i, txt) in enumerate(nu_res[-1][0]):
-                    plt.text(x[i], y[i], txt)
+                for (i, txt_i) in enumerate(txt):
+                    plt.text(x[i], y[i], txt_i)
     #xtot = np.array(xtot)
     #ytot = np.array(ytot)
     #(slope, intercept, rval, pval, stderr) = linregress(xtot, ytot)
     #plt.plot(xtot, xtot * slope + intercept , 'r')
     #plt.plot([0, 0], [10, 0], '--k')
     plt.xlabel('nu')
-    plt.ylabel('(nu_eff - nu)  / nu')
+    plt.ylabel('(nu_eff - nu) / nu')
     #plt.legend()
     plt.show()
