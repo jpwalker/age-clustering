@@ -54,7 +54,7 @@ def nu_eff(finaldir, age_i, massbins, cosmo, z, nu_no_age, bias_no_age):
     ##Read in Properties file
     data = readfile('{0}{1}'.format(finaldir, propfile), col = 28, delim = '    ', skip = 1)
     ret_array = [[], [], [], [], [], []]
-    for mass_i in range(1, massbins + 1):
+    for mass_i in massbins:
         idx2 = np.where(np.logical_and(data[0] == mass_i, data[1] == age_i))[0]
         med_age = data[25][idx2][0] ##median age of mass-age selection
         med_mass = data[4][idx2][0] ##median mass of mass bin 

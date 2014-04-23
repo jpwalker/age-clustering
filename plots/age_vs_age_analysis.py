@@ -29,8 +29,9 @@ def plot_percentiles(data, numbins, xlim, ylim, vert = True, color = 'k', linest
 
 if __name__ == '__main__':
     home = '{0}/'.format(os.environ['HOME'])
-    direc = '{0}Desktop/age-clustering-data/'.format(home)
-    age_file = 'attempt1millenniumIIsnap67_1057_fof.txt'
+    snap = 67
+    direc = '{0}Desktop/age-clustering-data/snap{1}/'.format(home, snap)
+    age_file = 'attempt1millenniumIIsnap67_1057_sub.txt'
     agekeys = ['assem_jp', 'assem_gao']
     lbls = ['FOF-Max_tree-Form. Age', 'FOF-Root-Form. Age']
     num_xbins = 30 #Number of bins on x axis. This is used for contour plot.
