@@ -12,9 +12,9 @@ import matplotlib.pyplot as plt
 if __name__ == '__main__':
     cosmo = {'omega_M_0': 0.25, 'omega_lambda_0': 0.75, 'omega_b_0': 0.045, \
              'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0} # INPUT
-    zs =  [6.196857, 4.179475, 2.0700316, 0.98870987, 0] #INPUT
+    zs = [4.179475]#[6.196857, 4.179475, 2.0700316, 0.98870987, 0] #INPUT
     home = '{0}/'.format(os.environ['HOME'])
-    snaps = [22, 27, 36, 45, 67]
+    snaps = [27]#[22, 27, 36, 45, 67]
     xtot = []
     ytot = []
     (nu_no_age, bias_no_age)  = cmpn.calc_seljak_warren(1000, cosmo)
@@ -30,11 +30,11 @@ if __name__ == '__main__':
             y = np.array([])
             txt = np.array([],dtype = int)
             if age_i == 0:
-                temp = cmpn.nu_eff(finaldir, age_i, 7, cosmo, z, nu_no_age, bias_no_age)
+                temp = cmpn.nu_eff(finaldir, age_i, [1, 2, 3, 4, 5, 6, 7], cosmo, z, nu_no_age, bias_no_age)
                 median_age = temp[5]
                 mass_i_median_age = temp[0]
             else:
-                nu_res.append(cmpn.nu_eff(finaldir, age_i, 7, cosmo, z, nu_no_age, bias_no_age))
+                nu_res.append(cmpn.nu_eff(finaldir, age_i, [1, 2, 3, 4, 5, 6, 7], cosmo, z, nu_no_age, bias_no_age))
                 for (idx, x_temp) in enumerate(nu_res[-1][5]):
                     if nu_res[-1][4][idx] > -100:
                         idx2 = np.where(mass_i_median_age == nu_res[-1][0][idx])[0]
@@ -52,6 +52,8 @@ if __name__ == '__main__':
     #(slope, intercept, rval, pval, stderr) = linregress(xtot, ytot)
     #plt.plot(xtot, xtot * slope + intercept , 'r')
     #plt.plot([0, 0], [10, 0], '--k')
+    #xfit = np.linspace(0.6, -0.6, 1000)
+    #yfit = 3. xfit ** (1/)
     plt.xlabel('age/<age> - 1')
     plt.ylabel('(nu_eff - nu) / nu')
     #plt.legend()

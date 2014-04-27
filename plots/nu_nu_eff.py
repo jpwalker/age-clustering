@@ -25,16 +25,16 @@ if __name__ == '__main__':
         col_j = ['k', 'b', 'c', 'g', 'm', 'r'] ##Predefined colors for age_i
         
         nu_res = []
-        for age_i in range(0,6):
+        for age_i in range(0,2):
             x = np.array([])
             y = np.array([])
             txt = np.array([],dtype = int)
             if age_i == 0:
-                temp = cmpn.nu_eff(finaldir, age_i, 7, cosmo, z, nu_no_age, bias_no_age)
+                temp = cmpn.nu_eff(finaldir, age_i, [1,2,3,4,5,6,7], cosmo, z, nu_no_age, bias_no_age)
                 median_age = temp[5]
                 mass_i_median_age = temp[0]
             else:
-                nu_res.append(cmpn.nu_eff(finaldir, age_i, 7, cosmo, z, nu_no_age, bias_no_age))
+                nu_res.append(cmpn.nu_eff(finaldir, age_i, [1,2,3,4,5,6,7], cosmo, z, nu_no_age, bias_no_age))
                 for (idx, x_temp) in enumerate(nu_res[-1][5]):
                     if nu_res[-1][4][idx] > -100:
                         x = np.append(x, nu_res[-1][2][idx]) 
