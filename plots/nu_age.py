@@ -37,7 +37,7 @@ if __name__ == '__main__':
                 nu_res.append(cmpn.nu_eff(finaldir, age_i, 7, cosmo, z, nu_no_age, bias_no_age))
                 for (idx, x_temp) in enumerate(nu_res[-1][5]):
                     idx2 = np.where(mass_i_median_age == nu_res[-1][0][idx])[0]
-                    x = np.append(x, (x_temp ))#- median_age[idx2]) / x_temp) 
+                    x = np.append(x, (x_temp - median_age[idx2]) / median_age[idx2]) 
                     y = np.append(y, nu_res[-1][2][idx])
                     txt = np.append(txt, nu_res[-1][0][idx])    
                 xtot.extend(x)
@@ -51,7 +51,7 @@ if __name__ == '__main__':
     #(slope, intercept, rval, pval, stderr) = linregress(xtot, ytot)
     #plt.plot(xtot, xtot * slope + intercept , 'r')
     #plt.plot([0, 0], [10, 0], '--k')
-    plt.xlabel('age')
+    plt.xlabel('(age - <age>) / <age>')
     plt.ylabel('nu')
     #plt.legend()
     plt.show()
