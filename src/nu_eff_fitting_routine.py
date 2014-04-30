@@ -14,11 +14,7 @@ def fitting_func((A, B), ls, rs):
     #ls is x and rs is y
     ret = []
     for i in range(len(ls)):
-        if ls[i] < 0:
-            new_ls = -(-ls[i]) ** B
-        else:
-            new_ls = ls[i] ** B
-        ret.append(rs[i] - A * new_ls)
+        ret.append(rs[i] - A * ls[i] ** B)
     return ret
 
 if __name__ == '__main__':
@@ -49,7 +45,8 @@ if __name__ == '__main__':
                 for (idx, x_temp) in enumerate(nu_res[-1][5]):
                     if nu_res[-1][4][idx] > -100:
                         idx2 = np.where(mass_i_median_age == nu_res[-1][0][idx])[0]
-                        x = np.append(x, ((x_temp - median_age[idx2]) / median_age[idx2])[0] ** 1. / nu_res[-1][2][idx]) 
+                        print ((x_temp - median_age[idx2]) / median_age[idx2])[0], 1. / nu_res[-1][2][idx]
+                        x = np.append(x, ((x_temp - median_age[idx2]) / median_age[idx2])[0] ** (1. / nu_res[-1][2][idx])) 
                         y = np.append(y, (nu_res[-1][4][idx] - nu_res[-1][2][idx]) / nu_res[-1][2][idx])
                         txt = np.append(txt, nu_res[-1][0][idx])
                 xtot.extend(x)
@@ -58,10 +55,8 @@ if __name__ == '__main__':
                 #         color = col_j[age_i], label = '{0}_{1}_{2}'.format(agelabel, s, age_i))
                 #for (i, txt_i) in enumerate(txt):
                 #    plt.text(x[i], y[i], txt_i)
-    xtot = np.array(xtot)
-    ytot = np.array(ytot)
     plt.plot([0,10],[0,10], '--')
-    best_fit_param = leastsq(fitting_func, (0.00001, 0.5), args = (xtot, ytot))
+    best_fit_param = leastsq(fitting_func, (1, 1), args = (xtot, ytot))
     plt.plot(best_fit_param[0][0] * xtot ** best_fit_param[0][1], ytot, '+')
     plt.xlabel('{0} (age - <age> / <age>) ^ {1} / nu'.format(best_fit_param[0][0], best_fit_param[0][1]))
     plt.ylabel('(nu_eff - nu) / nu')
