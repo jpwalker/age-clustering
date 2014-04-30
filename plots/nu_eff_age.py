@@ -30,11 +30,11 @@ if __name__ == '__main__':
             y = np.array([])
             txt = np.array([],dtype = int)
             if age_i == 0:
-                temp = cmpn.nu_eff(finaldir, age_i, 7, cosmo, z, nu_no_age, bias_no_age)
+                temp = cmpn.nu_eff(finaldir, age_i, range(1, 7), cosmo, z, nu_no_age, bias_no_age)
                 median_age = temp[5]
                 mass_i_median_age = temp[0]
             else:
-                nu_res.append(cmpn.nu_eff(finaldir, age_i, 7, cosmo, z, nu_no_age, bias_no_age))
+                nu_res.append(cmpn.nu_eff(finaldir, age_i, range(1, 7), cosmo, z, nu_no_age, bias_no_age))
                 for (idx, x_temp) in enumerate(nu_res[-1][5]):
                     if nu_res[-1][4][idx] > -100:
                         idx2 = np.where(mass_i_median_age == nu_res[-1][0][idx])[0]
