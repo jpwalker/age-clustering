@@ -99,7 +99,6 @@ if __name__ == "__main__":
     if len(sys.argv) == 4:
         h = 0.73
         massconv = 6.885e6 / h
-        num_mass_bins = 7
         num_age_bins = 5
         agekey = sys.argv[1]
         #agekey = 'form_jp'
@@ -119,7 +118,8 @@ if __name__ == "__main__":
         (halo_table_outdirec, xi_auto_outdirec, xi_cross_outdirec, bias_direc) = create_folders(indirec)
         #Mass Selection masses in number of particles
         #massbins = [1056, 1885, 1886, 3352, 3353, 5962, 5963, 10602, 10603, 33528, 33529, 106027, 106028, 80000000000]
-        massbins = readfile('mass_bins.txt', col = 1)
+        massbins = readfile('mass_bins.txt', col = 1)[0]
+        num_mass_bins = len(massbins) / 2
         massbin = [1, 0]
         #Prepare lists to store results0
         mass_selected_halos = [] #Stores halo tables for mass selected sets
