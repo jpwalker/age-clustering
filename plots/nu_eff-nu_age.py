@@ -12,9 +12,10 @@ import matplotlib.pyplot as plt
 if __name__ == '__main__':
     cosmo = {'omega_M_0': 0.25, 'omega_lambda_0': 0.75, 'omega_b_0': 0.045, \
              'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0} # INPUT
-    zs = [4.179475]#[6.196857, 4.179475, 2.0700316, 0.98870987, 0] #INPUT
+    markers = ['D', 's', 'o', '^', 'p']
+    zs = [6.196857, 4.179475, 2.0700316, 0.98870987, 0] #INPUT
     home = '{0}/'.format(os.environ['HOME'])
-    snaps = [27]#[22, 27, 36, 45, 67]
+    snaps = [22, 27, 36, 45, 67]
     xtot = []
     ytot = []
     (nu_no_age, bias_no_age)  = cmpn.calc_seljak_warren(1000, cosmo)

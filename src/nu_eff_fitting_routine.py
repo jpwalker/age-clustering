@@ -9,12 +9,15 @@ import os
 import compute_nu_eff as cmpn
 import matplotlib.pyplot as plt
 from scipy.optimize import leastsq
+from math import exp
 
 def fitting_func((A, B), ls, rs):
     #ls is x and rs is y
     ret = []
     for i in range(len(ls)):
-        ret.append(rs[i] - A * ls[i] ** B)
+        x = ls[i] - B
+        y = rs[i] - B
+        ret.append(y - x / (1. + exp(-A * x)))
     return ret
 
 if __name__ == '__main__':
@@ -37,17 +40,16 @@ if __name__ == '__main__':
             y = np.array([])
             txt = np.array([],dtype = int)
             if age_i == 0:
-                temp = cmpn.nu_eff(finaldir, age_i, range(1, 7), cosmo, z, nu_no_age, bias_no_age)
+                temp = cmpn.nu_eff(finaldir, age_i, range(1, 8), cosmo, z, nu_no_age, bias_no_age)
                 median_age = temp[5]
                 mass_i_median_age = temp[0]
             else:
-                nu_res.append(cmpn.nu_eff(finaldir, age_i, range(1, 7), cosmo, z, nu_no_age, bias_no_age))
+                nu_res.append(cmpn.nu_eff(finaldir, age_i, range(1, 8), cosmo, z, nu_no_age, bias_no_age))
                 for (idx, x_temp) in enumerate(nu_res[-1][5]):
                     if nu_res[-1][4][idx] > -100:
                         idx2 = np.where(mass_i_median_age == nu_res[-1][0][idx])[0]
-                        print ((x_temp - median_age[idx2]) / median_age[idx2])[0], 1. / nu_res[-1][2][idx]
-                        x = np.append(x, ((x_temp - median_age[idx2]) / median_age[idx2])[0] ** (1. / nu_res[-1][2][idx])) 
-                        y = np.append(y, (nu_res[-1][4][idx] - nu_res[-1][2][idx]) / nu_res[-1][2][idx])
+                        x = np.append(x, nu_res[-1][2][idx]) 
+                        y = np.append(y, nu_res[-1][4][idx])
                         txt = np.append(txt, nu_res[-1][0][idx])
                 xtot.extend(x)
                 ytot.extend(y)
@@ -56,9 +58,16 @@ if __name__ == '__main__':
                 #for (i, txt_i) in enumerate(txt):
                 #    plt.text(x[i], y[i], txt_i)
     plt.plot([0,10],[0,10], '--')
-    best_fit_param = leastsq(fitting_func, (1, 1), args = (xtot, ytot))
-    plt.plot(best_fit_param[0][0] * xtot ** best_fit_param[0][1], ytot, '+')
-    plt.xlabel('{0} (age - <age> / <age>) ^ {1} / nu'.format(best_fit_param[0][0], best_fit_param[0][1]))
-    plt.ylabel('(nu_eff - nu) / nu')
+    best_fit_param = leastsq(fitting_func, (1.0, 0.8), args = (xtot, ytot))
+    x = np.array(xtot) - best_fit_param[0][1]
+    y = np.array(ytot) - best_fit_param[0][1]
+    plt.plot(x / (1. + np.exp(-best_fit_param[0][0] * x)), y, 'k+')
+    plt.xlabel('(nu - {1}) / (1 + e^(-{0} * (nu - {1})))'.format(best_fit_param[0][0], best_fit_param[0][1]))
+    plt.ylabel('nu_eff - {0}'.format(best_fit_param[0][1]))
     #plt.legend()
+    plt.show()
+    plt.plot(xtot, ytot, 'k+')
+    plt.plot(xtot, x / (1.+ np.exp(-best_fit_param[0][0] * x)) + best_fit_param[0][1], 'r+')
+    plt.xlabel('nu')
+    plt.ylabel('nu_eff')
     plt.show()
