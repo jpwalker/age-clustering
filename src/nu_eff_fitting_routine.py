@@ -30,14 +30,14 @@ if __name__ == '__main__':
     (nu_no_age, bias_no_age)  = cmpn.calc_seljak_warren(1000, cosmo)
     col_j = ['k', 'b', 'c', 'g', 'm', 'r'] ##Predefined colors for age_i
     nu_res = []
-    ages = np.array([], dtype = float)
     fractional_age = []
     param1 = []
     param2 = []
-    for age_i in range(0,6):
+    for age_i in range(0,6): #Step through age_i
+        ages = np.array([], dtype = float)
         xtot = []
         ytot = []
-        for (t, s) in enumerate(snaps):
+        for (t, s) in enumerate(snaps): #Step through redshift
             z = zs[t]
             finaldir = '{0}Desktop/age-clustering-data/snap{1}{2}/attempt1_sub_form_gao/'.format(home, s, identifier) ##INPUT
             agelabel = 'Sub-Root-Form. Age' ##INPUT
@@ -50,10 +50,11 @@ if __name__ == '__main__':
                 mass_i_median_age = temp[0]
             else:
                 nu_res.append(cmpn.nu_eff(finaldir, age_i, range(1, 8), cosmo, z, nu_no_age, bias_no_age))
-                for (idx, x_temp) in enumerate(nu_res[-1][5]):
+                for (idx, x_temp) in enumerate(nu_res[-1][5]): #Step trhough mass_i
                     if nu_res[-1][4][idx] > -100:
-                        idx2 = np.where(mass_i_median_age == nu_res[-1][0][idx])[0]
-                        ages = np.append(ages, (nu_res[-1][5][idx] - median_age[idx2]) / median_age[idx2])
+                        idx2 = np.where(mass_i_median_age == nu_res[-1][0][idx])[0][0]
+                        ages = np.append(ages, (x_temp  - median_age[idx2]) / median_age[idx2])
+                        print s, nu_res[-1][0][idx], nu_res[-1][1][idx], ages[-1]
                         x = np.append(x, nu_res[-1][2][idx])
                         y = np.append(y, nu_res[-1][4][idx])
                         txt = np.append(txt, nu_res[-1][0][idx])
