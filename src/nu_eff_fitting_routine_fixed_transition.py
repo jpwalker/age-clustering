@@ -30,7 +30,13 @@ def fitting_func2((m1, b1, m2, b2), ls, rs, B):
     x = ls - nu0
     for i in range(len(ls)):
         g = 1. / (1. + exp(-B * x[i]))
-        ret[i] = rs - (m2 * ls[i] + b2 + ((m1 - m2) * ls[i] + b1 - b2) * g)
+        ret[i] = rs[i] - (m2 * ls[i] + b2 + ((m1 - m2) * ls[i] + b1 - b2) * g)
+    return ret
+
+def param_fit_func((A, B, C), x, y):
+    ret = np.zeros(len(x), dtype = np.float64)
+    for i in range(len(x)):
+        ret[i] = y[i] - (A * exp(B * x[i]) + C)
     return ret
     
 if __name__ == '__main__':
@@ -96,11 +102,15 @@ if __name__ == '__main__':
             #plt.plot(x / (1. + np.exp(-best_fit_param[0][0] * x)), y, '{0}*'.format(col_j[age_i]), label = str(age_i))
             plt.xlabel('(nu - {1}) / (1 + e^(-{0} * (nu - {1})))'.format(fixed_transition_model, param1[-1]))
             plt.ylabel('nu_eff - {0}'.format(param1[-1]))
+    fractional_age = np.array(fractional_age)
     plt.legend()
     plt.show()
+    best_fit_param2 = leastsq(param_fit_func, (1., .9, 0.), args = (fractional_age, param1))
     plt.plot(fractional_age, param1, '*')
+    plt.plot(fractional_age, best_fit_param2[0][0] * np.exp(best_fit_param2[0][1] * fractional_age) + best_fit_param2[0][2])
     plt.xlabel('(age - <age>) / <age>')
     plt.ylabel('param_1')
+    print 'nu_0 = {0} * e^({1} * frac_age) + {2}'.format(best_fit_param2[0][0], best_fit_param2[0][1], best_fit_param2[0][2]) 
     plt.show()
 #     plt.plot(xtot, ytot, 'k+')
 #     plt.plot(xtot, x / (1.+ np.exp(-best_fit_param[0][0] * x)) + best_fit_param[0][1], 'r+')
