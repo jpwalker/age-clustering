@@ -11,12 +11,12 @@ import matplotlib.pyplot as plt
 from scipy.optimize import leastsq
 from math import exp
 
-def fitting_func1((A), ls, rs, B):
+def fitting_func1((A), ls, rs, B, nu0):
     #ls =nu and rs=nu_eff
     ret = []
     for i in range(len(ls)):
-        x = ls[i] - A[0]
-        y = rs[i] - A[0]
+        x = ls[i] - (nu0[i] + A[0])
+        y = rs[i] - (nu0[i] + A[0])
         ret.append(y - x / (1. + exp(-B * x)))
     return ret
 
@@ -43,9 +43,9 @@ if __name__ == '__main__':
     fixed_transition_model = 200.
     cosmo = {'omega_M_0': 0.25, 'omega_lambda_0': 0.75, 'omega_b_0': 0.045, \
              'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0} # INPUT
-    zs =  [2.0700316]#[6.196857, 4.179475, 2.0700316, 0.98870987, 0] #INPUT
+    zs =  [6.196857]#[6.196857, 4.179475, 2.0700316, 0.98870987, 0] #INPUT
     home = '{0}/'.format(os.environ['HOME'])
-    snaps = [36]#[22, 27, 36, 45, 67]
+    snaps = [22]#[22, 27, 36, 45, 67]
     identifier = '-1'
     (nu_no_age, bias_no_age)  = cmpn.calc_seljak_warren(1000, cosmo)
     col_j = ['k', 'b', 'c', 'g', 'm', 'r'] ##Predefined colors for age_i
@@ -91,14 +91,16 @@ if __name__ == '__main__':
         if age_i != 0:
             plt.plot([0,10],[0,10], 'k--')
             fractional_age.append(np.median(ages))
-            best_fit_param = leastsq(fitting_func1, (0.8), args = (xtot, ytot, fixed_transition_model))
+            nu0 = 0.0865870010439 * np.exp(5.63860426154 * ages) + 0.774929306168
+            best_fit_param = leastsq(fitting_func1, (0.), args = (xtot, ytot, fixed_transition_model, nu0))
             param1.append(best_fit_param[0][0])
             #param2.append(best_fit_param[0][1])
             print 'Fitted age_i: {0}, snapshots: {1}, v_0 = {2}, A = {3}'.format(age_i, snaps, param1[-1], fixed_transition_model)
-            x = np.array(xtot) - param1[-1]
-            y = np.array(ytot) - param1[-1]
-            plt.plot(x + param1[-1], y + param1[-1], '{0}*'.format(col_j[age_i]), label = str(age_i))
-            plt.plot(x + param1[-1], x / (1.+ np.exp(-fixed_transition_model * x)) + param1[-1], '{0}+'.format(col_j[age_i]))
+            
+            x = np.array(xtot) - (param1[-1] + nu0)
+            y = np.array(ytot) - (param1[-1] + nu0)
+            plt.plot(x + (param1[-1] + nu0), y + (param1[-1] + nu0), '{0}*'.format(col_j[age_i]), label = str(age_i))
+            plt.plot(x + (param1[-1] + nu0), x / (1.+ np.exp(-fixed_transition_model * x)) + (param1[-1] + nu0), '{0}+'.format(col_j[age_i]))
             #plt.plot(x / (1. + np.exp(-best_fit_param[0][0] * x)), y, '{0}*'.format(col_j[age_i]), label = str(age_i))
             plt.xlabel('(nu - {1}) / (1 + e^(-{0} * (nu - {1})))'.format(fixed_transition_model, param1[-1]))
             plt.ylabel('nu_eff - {0}'.format(param1[-1]))
