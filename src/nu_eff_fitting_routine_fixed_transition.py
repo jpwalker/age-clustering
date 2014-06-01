@@ -11,13 +11,16 @@ import matplotlib.pyplot as plt
 from scipy.optimize import leastsq
 from math import exp
 
-def fitting_func1((A), ls, rs, B, nu0):
+def fitting_func1((A, B, C), ls, rs, B1, ages):
+    print A, B, C
+    nu0 = A * np.exp(B * ages) + C
     #ls =nu and rs=nu_eff
     ret = []
     for i in range(len(ls)):
-        x = ls[i] - (nu0[i] + A[0])
-        y = rs[i] - (nu0[i] + A[0])
-        ret.append(y - x / (1. + exp(-B * x)))
+        x = ls[i] - nu0[i]
+        y = rs[i] - nu0[i]
+        print x,y, B1
+        ret.append(y - x / (1. + exp(-B1 * x)))
     return ret
 
 def fitting_func2((m1, b1, m2, b2), ls, rs, B):
@@ -40,19 +43,18 @@ def param_fit_func((A, B, C), x, y):
     return ret
     
 if __name__ == '__main__':
-    fixed_transition_model = 200.
+    fixed_transition_model = 100.
     cosmo = {'omega_M_0': 0.25, 'omega_lambda_0': 0.75, 'omega_b_0': 0.045, \
              'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0} # INPUT
-    zs =  [6.196857]#[6.196857, 4.179475, 2.0700316, 0.98870987, 0] #INPUT
+    zs =  [6.196857, 4.179475, 2.0700316, 0.98870987, 0] #INPUT
     home = '{0}/'.format(os.environ['HOME'])
-    snaps = [22]#[22, 27, 36, 45, 67]
+    snaps = [22, 27, 36, 45, 67]
     identifier = '-1'
     (nu_no_age, bias_no_age)  = cmpn.calc_seljak_warren(1000, cosmo)
     col_j = ['k', 'b', 'c', 'g', 'm', 'r'] ##Predefined colors for age_i
     nu_res = []
     fractional_age = []
     param1 = []
-    param2 = []
     median_age = np.empty(0, dtype = float)
     mass_i_median_age = np.empty(0, dtype = float)
     snap_median_age = np.empty(0, dtype = int)
@@ -91,29 +93,29 @@ if __name__ == '__main__':
         if age_i != 0:
             plt.plot([0,10],[0,10], 'k--')
             fractional_age.append(np.median(ages))
-            nu0 = 0.0865870010439 * np.exp(5.63860426154 * ages) + 0.774929306168
-            best_fit_param = leastsq(fitting_func1, (0.), args = (xtot, ytot, fixed_transition_model, nu0))
-            param1.append(best_fit_param[0][0])
+            #nu0 = 0.0865870010439 * np.exp(5.63860426154 * ages) + 0.774929306168
+            best_fit_param = leastsq(fitting_func1, (0.08, 5.6, 0.77), args = (xtot, ytot, fixed_transition_model, ages))
+            param1.append(best_fit_param[0][:])
+            nu0 = param1[-1][0] * np.exp(param1[-1][1] * ages) + param1[-1][2]
             #param2.append(best_fit_param[0][1])
-            print 'Fitted age_i: {0}, snapshots: {1}, v_0 = {2}, A = {3}'.format(age_i, snaps, param1[-1], fixed_transition_model)
-            
-            x = np.array(xtot) - (param1[-1] + nu0)
-            y = np.array(ytot) - (param1[-1] + nu0)
-            plt.plot(x + (param1[-1] + nu0), y + (param1[-1] + nu0), '{0}*'.format(col_j[age_i]), label = str(age_i))
-            plt.plot(x + (param1[-1] + nu0), x / (1.+ np.exp(-fixed_transition_model * x)) + (param1[-1] + nu0), '{0}+'.format(col_j[age_i]))
+            print 'Fitted age_i: {0}, snapshots: {1}, A1 = {3}, Parameters: {4}, {5}, {6}'.format(age_i, snaps, fixed_transition_model, param1[-1][0], param1[-1][1], param1[-1][2])            
+            x = np.array(xtot) - nu0
+            y = np.array(ytot) - nu0
+            plt.plot(x / (1. + np.exp(-fixed_transition_model * x)), y, '{0}*'.format(col_j[age_i]), label = str(age_i))
+            plt.plot(x, x / (1.+ np.exp(-fixed_transition_model * x)), '{0}+'.format(col_j[age_i]))
             #plt.plot(x / (1. + np.exp(-best_fit_param[0][0] * x)), y, '{0}*'.format(col_j[age_i]), label = str(age_i))
             plt.xlabel('(nu - {1}) / (1 + e^(-{0} * (nu - {1})))'.format(fixed_transition_model, param1[-1]))
             plt.ylabel('nu_eff - {0}'.format(param1[-1]))
     fractional_age = np.array(fractional_age)
     plt.legend()
     plt.show()
-    best_fit_param2 = leastsq(param_fit_func, (1., .9, 0.), args = (fractional_age, param1))
-    plt.plot(fractional_age, param1, '*')
-    plt.plot(fractional_age, best_fit_param2[0][0] * np.exp(best_fit_param2[0][1] * fractional_age) + best_fit_param2[0][2])
-    plt.xlabel('(age - <age>) / <age>')
-    plt.ylabel('param_1')
-    print 'nu_0 = {0} * e^({1} * frac_age) + {2}'.format(best_fit_param2[0][0], best_fit_param2[0][1], best_fit_param2[0][2]) 
-    plt.show()
+#     best_fit_param2 = leastsq(param_fit_func, (1., .9, 0.), args = (fractional_age, param1))
+#     plt.plot(fractional_age, param1, '*')
+#     plt.plot(fractional_age, best_fit_param2[0][0] * np.exp(best_fit_param2[0][1] * fractional_age) + best_fit_param2[0][2])
+#     plt.xlabel('(age - <age>) / <age>')
+#     plt.ylabel('param_1')
+#     print 'nu_0 = {0} * e^({1} * frac_age) + {2}'.format(best_fit_param2[0][0], best_fit_param2[0][1], best_fit_param2[0][2]) 
+#     plt.show()
 #     plt.plot(xtot, ytot, 'k+')
 #     plt.plot(xtot, x / (1.+ np.exp(-best_fit_param[0][0] * x)) + best_fit_param[0][1], 'r+')
 #     plt.xlabel('nu')
