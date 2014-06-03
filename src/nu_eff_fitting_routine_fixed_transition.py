@@ -39,7 +39,22 @@ def fitting_func2((m1, b1, m2, b2), ls, rs, B):
         ret[i] = rs[i] - (m2 * ls[i] + b2 + ((m1 - m2) * ls[i] + b1 - b2) * g)
     return ret
 
+def fitting_func3((A,), ls, rs, B1):
+    print A
+    #ls =nu and rs=nu_eff
+    ret = []
+    for i in range(len(ls)):
+        x = ls[i] - A
+        y = rs[i] - A
+        try:
+            e = exp(-B1 * x)
+        except OverflowError:
+            e = 1E100
+        ret.append(y - x / (1. + e))
+    return ret
+
 def param_fit_func((A, B, C), x, y):
+    print A, B, C
     ret = np.zeros(len(x), dtype = np.float64)
     for i in range(len(x)):
         ret[i] = y[i] - (A * exp(B * x[i]) + C)
@@ -49,9 +64,9 @@ if __name__ == '__main__':
     fixed_transition_model = 300.
     cosmo = {'omega_M_0': 0.25, 'omega_lambda_0': 0.75, 'omega_b_0': 0.045, \
              'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0} # INPUT
-    zs =  [6.196857, 4.179475, 2.0700316, 0.98870987, 0] #INPUT
+    zs = [0.9887] #[6.196857, 4.179475, 2.0700316, 0.98870987, 0] #INPUT
     z_points = ['o', '^', 'v', 's', 'p'] ##Predefined points for redshift
-    snaps = [22, 27, 36, 45, 67]
+    snaps = [45]#[22, 27, 36, 45, 67]
     home = '{0}/'.format(os.environ['HOME'])
     snap_identifier = '-1'
     (nu_no_age, bias_no_age)  = cmpn.calc_seljak_warren(1000, cosmo)
@@ -63,14 +78,14 @@ if __name__ == '__main__':
     snap_median_age = np.empty(0, dtype = int)
     
     #Properties for the mass-age sample across all redshifts.
-    param = [] 
     tot_age = np.empty(0, dtype = float)
     tot_nueff = np.empty(0, dtype = float)
     tot_nu = np.empty(0, dtype = float)
     tot_z = np.empty(0, dtype = float)
+    medianage_agei = np.empty(0, dtype = float)
+    testnu0 = np.empty(0, dtype = float)
     for age_i in range(0,6): #Step through age_i
         #Properties for each age_i seperately
-        medianage_agei = np.empty(0, dtype = float)
         ages_agei = np.empty(0, dtype = float)
         nu_agei = np.empty(0, dtype = float) 
         nueff_agei = np.empty(0, dtype = float)
@@ -103,8 +118,8 @@ if __name__ == '__main__':
         #done running through all snapshots for each age_i
         if age_i != 0:
             medianage_agei = np.append(medianage_agei, np.median(ages_agei))
-            nu0 = 0.0865870010439 * np.exp(5.63860426154 * ages_agei) + 0.774929306168
-            #param = leastsq(fitting_func1, (0.08, 5.6, 0.77), args = (xtot, ytot, fixed_transition_model, ages))
+            testnu0 = np.append(testnu0, leastsq(fitting_func3, (1.), args = (nu_agei, nueff_agei, fixed_transition_model))[0][0])
+            nu0 = 2.76206234249e-06 * np.exp(36.3814994502 * ages_agei) + 0.729289633093
             #param1.append(best_fit_param[0][:])
             #nu0 = param1[-1][0] * np.exp(param1[-1][1] * ages) + param1[-1][2]
             #param2.append(best_fit_param[0][1])
@@ -123,6 +138,13 @@ if __name__ == '__main__':
     plt.plot(temp, temp, 'k--') #Plot y=x line
     plt.xlabel('x * g(x)')
     plt.ylabel('y')
+    plt.show()
+    
+    plt.plot(medianage_agei, testnu0, '*k')
+    nu0_params = leastsq(param_fit_func, (0.01, 10., 5.), args = (medianage_agei, testnu0))[0]
+    plt.plot(medianage_agei, nu0_params[0] * np.exp(medianage_agei * nu0_params[1]) + nu0_params[2], '-k')
+    plt.xlabel('median_age')
+    plt.ylabel('nu0')
     plt.show()
     
     param = leastsq(fitting_func1, (1., 1.), args = (tot_nu, tot_nueff, fixed_transition_model, tot_age))
