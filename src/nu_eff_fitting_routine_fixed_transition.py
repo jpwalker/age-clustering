@@ -84,26 +84,25 @@ if __name__ == '__main__':
     tot_z = np.empty(0, dtype = float)
     medianage_agei = np.empty(0, dtype = float)
     testnu0 = np.empty(0, dtype = float)
-    for age_i in range(0,6): #Step through age_i
+    for (t, s) in enumerate(snaps): #Step through redshift
         #Properties for each age_i seperately
         ages_agei = np.empty(0, dtype = float)
         nu_agei = np.empty(0, dtype = float) 
         nueff_agei = np.empty(0, dtype = float)
         z_agei = np.empty(0, dtype = float)
-        for (t, s) in enumerate(snaps): #Step through redshift
-            z = zs[t]
-            pnt = z_points[t]
-            finaldir = '{0}Desktop/age-clustering-data/snap{1}{2}/attempt1_sub_form_gao/'.format(home, s, snap_identifier) ##INPUT
-            agelabel = 'Sub-Root-Form. Age' ##INPUT ##Label for age definition
-            if age_i == 0:
-                temp = cmpn.nu_eff(finaldir, age_i, range(1, 8), cosmo, z, nu_no_age, bias_no_age)
-                median_age = np.append(median_age, temp[5])
-                mass_i_median_age = np.append(mass_i_median_age, temp[0])
-                snap_median_age = np.append(snap_median_age, np.ones(len(temp[0])) * s)
-            else:
-                nu_res = cmpn.nu_eff(finaldir, age_i, range(1, 8), cosmo, z, nu_no_age, bias_no_age)
-                for (idx, x_temp) in enumerate(nu_res[5]): #Step through mass_i and enumerate the age
-                    if nu_res[4][idx] > -100: ##If there is a nu_eff calculated for this object
+        z = zs[t]
+        pnt = z_points[t]
+        finaldir = '{0}Desktop/age-clustering-data/snap{1}{2}/attempt1_sub_form_gao/'.format(home, s, snap_identifier) ##INPUT
+        agelabel = 'Sub-Root-Form. Age' ##INPUT ##Label for age definition
+        if age_i == 0:
+            temp = cmpn.nu_eff(finaldir, age_i, range(1, 8), cosmo, z, nu_no_age, bias_no_age)
+            median_age = np.append(median_age, temp[5])
+            mass_i_median_age = np.append(mass_i_median_age, temp[0])
+            snap_median_age = np.append(snap_median_age, np.ones(len(temp[0])) * s)
+        else:
+            nu_res = cmpn.nu_eff(finaldir, age_i, range(1, 8), cosmo, z, nu_no_age, bias_no_age)
+            for (idx, x_temp) in enumerate(nu_res[5]): #Step through mass_i and enumerate the age
+                if nu_res[4][idx] > -100: ##If there is a nu_eff calculated for this object
                         idx2 = np.where(np.logical_and(mass_i_median_age == nu_res[0][idx], snap_median_age == s))[0][0]
                         #agei parameters
                         ages_agei = np.append(ages_agei, (x_temp - median_age[idx2]) / median_age[idx2])
