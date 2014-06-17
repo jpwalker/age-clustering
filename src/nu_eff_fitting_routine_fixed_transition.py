@@ -89,6 +89,9 @@ if __name__ == '__main__':
         finaldir = '{0}Desktop/age-clustering-data/snap{1}{2}/attempt1_sub_form_gao/'.format(home, s, snap_identifier) ##INPUT
         agelabel = 'Sub-Root-Form. Age' ##INPUT ##Label for age definition
         nu_res = cmpn.nu_eff(finaldir, range(0, 6), range(1, 8), cosmo, z, nu_no_age, bias_no_age)
+        fit_age = np.empty(dtype = float)
+        fit_nu = np.empty(dtype = float)
+        fit_nueff = np.empty(dtype = float)
         for age_i in range(1, 6): #Step through mass_i and enumerate the age
             tot_agei = np.empty(0, dtype= int)
             tot_massi = np.empty(0, dtype = int)
@@ -109,6 +112,10 @@ if __name__ == '__main__':
                     tot_nueff = np.append(tot_nueff, nu_res[4][idx])
                     tot_z = np.append(tot_z, t) #this is the index of the redshift for this sample
             p1[t] = plt.plot(tot_nu, tot_nueff, '{0}{1}'.format(pnt, color))[0]
+            fit_age = np.append(fit_age, tot_age)
+            fit_nu = np.append(fit_nu, tot_nu)
+            fit_nueff = np.append(fit_nueff, tot_nueff)
+    
     plt.legend(p1, zs, bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.)
     plt.xlabel('(age - <age>) / <age>')
     plt.ylabel('nu_eff')
