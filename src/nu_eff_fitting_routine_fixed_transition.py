@@ -4,15 +4,17 @@ Fit nu_eff(nu) with a fixed transition in the break off.
 @author: jpwalker
 '''
 
+import matplotlib.pyplot as plt
+import pylab
+from mpl_toolkits.mplot3d import Axes3D
+
 import numpy as np
 import os
 import compute_nu_eff as cmpn
-import matplotlib.pyplot as plt
 from scipy.optimize import leastsq
 from math import exp
 
-def fitting_func1((A, B, C), ls, rs, B1, ages):
-    print A, B, C
+def fitting_func1((A, B, C, D), ls, rs, ages):
     nu0 = A * np.exp(B * ages) + C
     #ls =nu and rs=nu_eff
     ret = []
@@ -20,7 +22,7 @@ def fitting_func1((A, B, C), ls, rs, B1, ages):
         x = ls[i] - nu0[i]
         y = rs[i] - nu0[i]
         try:
-            e = exp(-B1 * x)
+            e = exp(-D * x)
         except OverflowError:
             e = 1E100
         ret.append(y - x / (1. + e))
@@ -83,15 +85,18 @@ if __name__ == '__main__':
     col_j = ['k', 'b', 'c', 'g', 'm', 'r'] ##Predefined colors for age_i
     p1 = np.empty(len(snaps), dtype = np.object)
     #Properties for the mass-age sample across all redshifts
+    best_fits = []
     for (t, s) in enumerate(snaps): #Step through redshift
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection = '3d')
         z = zs[t]
         pnt = z_points[t]
-        finaldir = '{0}Desktop/age-clustering-data/snap{1}{2}/attempt1_sub_form_gao/'.format(home, s, snap_identifier) ##INPUT
+        finaldir = '{0}Desktop/age-clustering-data/snap{1}{2}/attempt1_sub_form_jp/'.format(home, s, snap_identifier) ##INPUT
         agelabel = 'Sub-Root-Form. Age' ##INPUT ##Label for age definition
         nu_res = cmpn.nu_eff(finaldir, range(0, 6), range(1, 8), cosmo, z, nu_no_age, bias_no_age)
-        fit_age = np.empty(dtype = float)
-        fit_nu = np.empty(dtype = float)
-        fit_nueff = np.empty(dtype = float)
+        fit_age = np.empty(0, dtype = float)
+        fit_nu = np.empty(0, dtype = float)
+        fit_nueff = np.empty(0, dtype = float)
         for age_i in range(1, 6): #Step through mass_i and enumerate the age
             tot_agei = np.empty(0, dtype= int)
             tot_massi = np.empty(0, dtype = int)
@@ -111,15 +116,22 @@ if __name__ == '__main__':
                     tot_nu = np.append(tot_nu, nu_res[2][idx])
                     tot_nueff = np.append(tot_nueff, nu_res[4][idx])
                     tot_z = np.append(tot_z, t) #this is the index of the redshift for this sample
-            p1[t] = plt.plot(tot_nu, tot_nueff, '{0}{1}'.format(pnt, color))[0]
+            #p1[t] = ax1.plot(tot_nu, tot_nueff, '{0}{1}'.format(pnt, color))[0]
+            ax.scatter(fit_age, fit_nu, fit_nueff, marker = pnt, color = color)
             fit_age = np.append(fit_age, tot_age)
             fit_nu = np.append(fit_nu, tot_nu)
             fit_nueff = np.append(fit_nueff, tot_nueff)
-    
-    plt.legend(p1, zs, bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.)
-    plt.xlabel('(age - <age>) / <age>')
-    plt.ylabel('nu_eff')
+        best_fits.append(leastsq(fitting_func1, (0.01, 10., 5., 50.), args = (fit_nu, fit_nueff, fit_age)))
+    ax.set_xlabel('age')
+    ax.set_ylabel('nu')
+    ax.set_zlabel('nu_eff')
     plt.show()
+    for i in best_fits:
+        i[0]
+#     plt.legend(p1, zs, bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.)
+#     plt.xlabel('(age - <age>) / <age>')
+#     plt.ylabel('nu_eff')
+#     fig1.show()
         
         
         
