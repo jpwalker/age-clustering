@@ -122,6 +122,8 @@ if __name__ == '__main__':
             fit_nu = np.append(fit_nu, tot_nu)
             fit_nueff = np.append(fit_nueff, tot_nueff)
         best_fits.append(leastsq(fitting_func1, (0.01, 10., 5., 50.), args = (fit_nu, fit_nueff, fit_age)))
+        bf = best_fits[-1]
+        
     ax.set_xlabel('age')
     ax.set_ylabel('nu')
     ax.set_zlabel('nu_eff')
