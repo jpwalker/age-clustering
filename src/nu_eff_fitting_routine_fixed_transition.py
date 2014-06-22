@@ -86,17 +86,17 @@ if __name__ == '__main__':
     p1 = np.empty(len(snaps), dtype = np.object)
     #Properties for the mass-age sample across all redshifts
     best_fits = []
+    fit_age = np.empty(0, dtype = float)
+    fit_nu = np.empty(0, dtype = float)
+    fit_nueff = np.empty(0, dtype = float)
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection = '3d')
     for (t, s) in enumerate(snaps): #Step through redshift
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection = '3d')
         z = zs[t]
         pnt = z_points[t]
         finaldir = '{0}Desktop/age-clustering-data/snap{1}{2}/attempt1_sub_form_jp/'.format(home, s, snap_identifier) ##INPUT
         agelabel = 'Sub-Root-Form. Age' ##INPUT ##Label for age definition
         nu_res = cmpn.nu_eff(finaldir, range(0, 6), range(1, 8), cosmo, z, nu_no_age, bias_no_age)
-        fit_age = np.empty(0, dtype = float)
-        fit_nu = np.empty(0, dtype = float)
-        fit_nueff = np.empty(0, dtype = float)
         for age_i in range(1, 6): #Step through mass_i and enumerate the age
             tot_agei = np.empty(0, dtype= int)
             tot_massi = np.empty(0, dtype = int)
@@ -121,8 +121,8 @@ if __name__ == '__main__':
             fit_age = np.append(fit_age, tot_age)
             fit_nu = np.append(fit_nu, tot_nu)
             fit_nueff = np.append(fit_nueff, tot_nueff)
-        best_fits.append(leastsq(fitting_func1, (0.01, 10., 5., 50.), args = (fit_nu, fit_nueff, fit_age)))
-        bf = best_fits[-1]
+    best_fits.append(leastsq(fitting_func1, (0.01, 10., 5., 50.), args = (fit_nu, fit_nueff, fit_age)))
+    bf = best_fits[-1]
         
     ax.set_xlabel('age')
     ax.set_ylabel('nu')
