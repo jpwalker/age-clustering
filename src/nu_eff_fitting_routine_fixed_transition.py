@@ -14,7 +14,7 @@ import compute_nu_eff as cmpn
 from scipy.optimize import leastsq
 from math import exp
 
-def fitting_func1((A, B, C, D), ls, rs, ages):
+def fitting_func1((A, B, C, D, E, F), ls, rs, ages):
     nu0 = A * np.exp(B * ages) + C
     #ls =nu and rs=nu_eff
     ret = []
@@ -22,7 +22,11 @@ def fitting_func1((A, B, C, D), ls, rs, ages):
         x = ls[i] - nu0[i]
         y = rs[i] - nu0[i]
         try:
-            e = exp(-D * x)
+            trans = D * exp(E * ages[i]) + F
+        except OverflowError:
+            trans = 500.
+        try:
+            e = exp(-trans * x)
         except OverflowError:
             e = 1E100
         ret.append(y - x / (1. + e))
@@ -71,6 +75,24 @@ def index_nu_eff(data, a_i, m_i):
         idx2 = idx2.union(set(np.where(data[0] == mass_i)[0]))
     ret = idx2.intersection(idx)
     return np.array(list(ret))
+
+def surface_vals(y, x, (A, B, C, D, E, F)):
+    nu0 = A * np.exp(B * y) + C
+    x = x - nu0
+    trans = D * np.exp(E * x) + F
+    return x / (1. + np.exp(-trans * x)) + nu0
+ 
+def plot_best_fit(axis, (A, B, C, D, E, F)):
+    low_nu = 0.5
+    nu_step = 0.05
+    high_nu = 3 + nu_step
+    low_age = -0.5
+    age_step = 0.05
+    high_age = .5 + age_step
+    mesh = np.meshgrid(np.arange(low_age, high_age, age_step), 
+                       np.arange(low_nu, high_nu, nu_step))
+    z = surface_vals(mesh[0], mesh[1], (A, B, C, D, E, F))
+    axis.plot_wireframe(mesh[0], mesh[1], z)
     
 if __name__ == '__main__':
     fixed_transition_model = 300.
@@ -117,13 +139,13 @@ if __name__ == '__main__':
                     tot_nueff = np.append(tot_nueff, nu_res[4][idx])
                     tot_z = np.append(tot_z, t) #this is the index of the redshift for this sample
             #p1[t] = ax1.plot(tot_nu, tot_nueff, '{0}{1}'.format(pnt, color))[0]
-            ax.scatter(fit_age, fit_nu, fit_nueff, marker = pnt, color = color)
+            ax.scatter(fit_age, fit_nu, fit_nueff, marker = pnt, c = color)
             fit_age = np.append(fit_age, tot_age)
             fit_nu = np.append(fit_nu, tot_nu)
             fit_nueff = np.append(fit_nueff, tot_nueff)
-    best_fits.append(leastsq(fitting_func1, (0.01, 10., 5., 50.), args = (fit_nu, fit_nueff, fit_age)))
+    best_fits.append(leastsq(fitting_func1, (0.01, 10., 5., 0.01, 10., 5.), args = (fit_nu, fit_nueff, fit_age)))
     bf = best_fits[-1]
-        
+    plot_best_fit(ax, bf[0])
     ax.set_xlabel('age')
     ax.set_ylabel('nu')
     ax.set_zlabel('nu_eff')
