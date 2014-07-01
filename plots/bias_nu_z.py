@@ -24,7 +24,8 @@ def plot_seljak_warren(M_low, M_high, cosmo):
 
 if __name__ == '__main__':
     h = 0.73
-    snap_dirs = ['snap22', 'snap27', 'snap36', 'snap45', 'snap67']
+    snaps = [22, 27, 36, 45, 67]
+    snap_id = '-1'
     z = [6.196857, 4.179475, 2.0700316, 0.98870987, 0] #Update the redshift
     #Cosmology for MS and MS2
     cosmo = {'omega_M_0': 0.25, 'omega_lambda_0': 0.75, 'omega_b_0': 0.045, \
@@ -37,8 +38,9 @@ if __name__ == '__main__':
     mass_bins = 7
     ifile = 'properties.dat'
     agelabel = 'Sub-Max_tree-Form. Age'
-    for (i, s) in enumerate(snap_dirs):
-        direc = '{0}Desktop/age-clustering-data/{1}/attempt1_sub_form_gao/'.format(home, s)
+    for (i, s) in enumerate(snaps):
+        snap_dir = 'snap{0}{1}'.format(s, snap_id)
+        direc = '{0}Desktop/age-clustering-data/{1}/attempt1_sub_form_jp/'.format(home, snap_dir)
         data = readfile('{0}{1}'.format(direc, ifile), col = 28, delim = '    ', skip = 1)
         col_j = ['k', 'b', 'c', 'g', 'm', 'r'] #Colors of Age bins that are plotted
         for age_i in range(0, age_bins + 1):
@@ -52,7 +54,7 @@ if __name__ == '__main__':
                 mass.append(data[4][idx2][0])
             bias = np.array(bias)
             mass = np.array(mass)
-            plt.plot(compute_nu(mass * massconv / h, z[i], cosmo), bias, color = col_j[age_i], \
+            plt.plot(compute_nu(mass * massconv / h, z[i], cosmo), bias, '*', color = col_j[age_i], \
                      label = '{0}_{1}_{2}'.format(agelabel, age_i, z[i]))
     rc('text', usetex = True)
     plt.xlabel('$\\nu$')

@@ -20,21 +20,21 @@ if __name__ == '__main__':
     (nu_no_age, bias_no_age)  = cmpn.calc_seljak_warren(1000, cosmo)
     for (t, s) in enumerate(snaps):
         z = zs[t]
-        finaldir = '{0}Desktop/age-clustering-data/snap{1}/attempt1_sub_form_gao/'.format(home, s) ##INPUT
+        finaldir = '{0}Desktop/age-clustering-data/snap{1}/attempt1_sub_form_jp/'.format(home, s) ##INPUT
         agelabel = 'Sub-Root-Form. Age' ##INPUT
         col_j = ['k', 'b', 'c', 'g', 'm', 'r'] ##Predefined colors for age_i
         
         nu_res = []
-        for age_i in range(0,2):
+        for age_i in range(0,6):
             x = np.array([])
             y = np.array([])
             txt = np.array([],dtype = int)
             if age_i == 0:
-                temp = cmpn.nu_eff(finaldir, age_i, [1,2,3,4,5,6,7], cosmo, z, nu_no_age, bias_no_age)
+                temp = cmpn.nu_eff(finaldir, (age_i,), [1,2,3,4,5,6,7], cosmo, z, nu_no_age, bias_no_age)
                 median_age = temp[5]
                 mass_i_median_age = temp[0]
             else:
-                nu_res.append(cmpn.nu_eff(finaldir, age_i, [1,2,3,4,5,6,7], cosmo, z, nu_no_age, bias_no_age))
+                nu_res.append(cmpn.nu_eff(finaldir, (age_i,), [1,2,3,4,5,6,7], cosmo, z, nu_no_age, bias_no_age))
                 for (idx, x_temp) in enumerate(nu_res[-1][5]):
                     if nu_res[-1][4][idx] > -100:
                         x = np.append(x, nu_res[-1][2][idx]) 
@@ -42,10 +42,10 @@ if __name__ == '__main__':
                         txt = np.append(txt, nu_res[-1][0][idx])    
                 xtot.extend(x)
                 ytot.extend(y)
-                plt.plot(x, y, '+', 
+                plt.plot(x, y, '*', 
                          color = col_j[age_i], label = '{0}_{1}_{2}'.format(agelabel, s, age_i))
-                for (i, txt_i) in enumerate(txt):
-                    plt.text(x[i], y[i], txt_i)
+#                 for (i, txt_i) in enumerate(txt):
+#                     plt.text(x[i], y[i], txt_i)
     #xtot = np.array(xtot)
     #ytot = np.array(ytot)
     #(slope, intercept, rval, pval, stderr) = linregress(xtot, ytot)
