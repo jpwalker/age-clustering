@@ -116,7 +116,7 @@ if __name__ == '__main__':
     for (t, s) in enumerate(snaps): #Step through redshift
         z = zs[t]
         pnt = z_points[t]
-        finaldir = '{0}Desktop/age-clustering-data/snap{1}{2}/attempt1_sub_form_gao/'.format(home, s, snap_identifier) ##INPUT
+        finaldir = '{0}Desktop/age-clustering-data/snap{1}{2}/attempt1_sub_form_jp/'.format(home, s, snap_identifier) ##INPUT
         agelabel = 'Sub-Max_Tree-Form. Age' ##INPUT ##Label for age definition
         nu_res = cmpn.nu_eff(finaldir, range(0, 6), range(1, 8), cosmo, z, nu_no_age, bias_no_age)
         for age_i in range(1, 6): #Step through mass_i and enumerate the age
