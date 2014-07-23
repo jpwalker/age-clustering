@@ -8,11 +8,11 @@ if __name__ == "__main__":
     home = '{0}/'.format(os.environ['HOME'])
     direc = '{0}Desktop/age-clustering-data/'.format(home)
     age_file = ('attempt1millenniumIIsnap67_1057_fof.txt', 'attempt1millenniumIIsnap67_1057_sub.txt')
-    agekeys = [['form_gao', 'form_jp', 'assem_gao', 'assem_jp', 'merg'], ['form_gao', 'form_jp', 'assem_gao', 'assem_jp']]
-    labls = [['FOF-Root-Form. Age', 'FOF-Max_tree-Form. Age', 'FOF-Root-Assem. Age', 'FOF-Max_tree-Assem. Age', 'Major Merger Age'], \
+    agekeys = [['form_gao', 'form_jp', 'assem_gao', 'assem_jp'], ['form_gao', 'form_jp', 'assem_gao', 'assem_jp']]
+    labls = [['FOF-Root-Form. Age', 'FOF-Max_tree-Form. Age', 'FOF-Root-Assem. Age', 'FOF-Max_tree-Assem. Age'], \
              ['Sub-Root-Form. Age', 'Sub-Max_tree-Form. Age', 'Sub-Root-Assem. Age', 'Sub-Max_tree-Assem. Age']]
-    lines = [['solid', 'dashed', 'solid', 'dashed', 'solid'], ['solid', 'dashed', 'solid', 'dashed']]
-    colrs = [['k', 'k', 'r', 'r', 'b'], ['k', 'k', 'r', 'r']]
+    lines = [['solid', 'dashed', 'solid', 'dashed'], ['solid', 'dashed', 'solid', 'dashed']]
+    colrs = [['k', 'k', 'r', 'r'], ['k', 'k', 'r', 'r']]
     halos = (read_halo_table_ascii('{0}{1}'.format(direc, age_file[0]), \
                                   fmt = 'x,x,x,x,x,x,x,x,x,x,x,x,x,17,x,21,22,23,24,27,25,28,26,29'), \
              read_halo_table_ascii('{0}{1}'.format(direc, age_file[1]), \
