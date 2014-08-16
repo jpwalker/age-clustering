@@ -6,6 +6,7 @@ Created on Jul 17, 2013
 
 from MillenniumII import *
 import matplotlib.pyplot as plt
+from matplotlib import rc
 import numpy as np
 import math as mth
 import os
@@ -76,27 +77,11 @@ def plot_redshift(p, redshifts, fof_np, age_labels, symbls):
     MS = 2.89 * (avg[0] / 10. ** 10.) ** -0.0563
     p.semilogx(avg[0], MS, 'r', label = 'MS Curve')
     p.legend(fontsize = "small")
-    p.set_xlabel('M [M_sun / h]')
-    p.set_ylabel('z + 1')
-    
-    ##Create Second x axis
-    xlims = p.get_xlim()
-    x2 = p.twiny()
-    x2.set_xscale('log')
-    x2.set_xlim((xlims[0] / .73, xlims[1] / .73))
-    x2.set_xlabel('M [M_sun]')
-    
+    #p.set_xlabel('M [M_sun]')
+    #p.set_ylabel('z + 1')
+    p.set_xlim(5e9, 1.1e15)
+    p.set_ylim(1.4, 5.22)
     ##Create second y axis
-    ylims = p.get_ylim()
-    yt = p.get_yticks()
-    y2 = p.twinx()
-    y2.set_ylim(ylims)
-    y2.set_yticks(yt)
-    yl = []
-    for j in yt:
-        yl.append('{:5.2f}'.format(13.5795 - mth.asinh((j / 1.4424957031) ** (-3. / 2.)) / 0.0969815))
-    y2.set_yticklabels(yl)
-    y2.set_ylabel('Lookbacktime')  
 
 def s_plot(p, fnames, age_keys, age_labels, symbols):
     for i in range(len(fnames)):
@@ -113,7 +98,7 @@ def s_plot(p, fnames, age_keys, age_labels, symbols):
                 idx = np.where(tempage <= 13.5)
                 tempmass = tempmass[idx]
                 tempage = tempage[idx]
-            fof_np.append(tempmass * massconv)
+            fof_np.append(tempmass * massconv / h) ## fof_np is in M_sun units
             form.append(tempage)
             redshifts.append(1.44224957031 * np.sinh(0.0969815 * (13.5795 - form[-1])) ** (-2. / 3.))
         #plot_age(p, form, fof_np, age_labels, symbls)
@@ -128,16 +113,33 @@ if __name__ == '__main__':
                  'attempt1millenniumIIsnap67_1057_sub.txt'))
     age_key = ((('form_gao', 'form_jp'), ('form_gao', 'form_jp')), 
                (('assem_gao', 'assem_jp'), ('assem_gao', 'assem_jp')))
-    age_labels = ((('FOF-Root-Form. Age', 'FOF-Max_tree-Form. Age'), 
-                   ('Sub-Root-Form. Age', 'Sub-Max_tree-Form. Age')), 
-                  (('FOF-Root-Assem. Age', 'FOF-Max_tree-Assem. Age'), 
-                   ('Sub-Root-Assem. Age', 'Sub-Max_tree-Assem. Age')))
+    age_labels = ((('FOF-Root-Form. Age', 'FOF-Max-Form. Age'), 
+                   ('Sub-Root-Form. Age', 'Sub-Max-Form. Age')), 
+                  (('FOF-Root-Assem. Age', 'FOF-Max-Assem. Age'), 
+                   ('Sub-Root-Assem. Age', 'Sub-Max-Assem. Age')))
     symbls = ((('s', '^'), ('s', '^')), (('s', '^'), ('s', '^')))
     h = 0.73
     massconv = 6.885e6 #Mass conversion reports mass in M_sun/h
+    rc('font', **{'family': 'sans-serif', 'sans-serif': ['Helvetica']})
+    rc('text', usetex = True)
+    ## Create figures and subplots
     (fig, ax) = plt.subplots(2, 2, True, True)
+    ## Axis Labels
+    fig.text(0.47, 0.03, "M $(\\mathrm{M}_\\odot)$")
+    fig.text(0.972,0.62, 'Lookback time (Gyr)', rotation = 'vertical')
+    fig.text(0.034, 0.53, "$z+1$", rotation = 'vertical')
     for (i_idx, i) in enumerate(ax):
         for (j_idx, j) in enumerate(i):
             s_plot(j, (age_file[i_idx][j_idx],), age_key[i_idx][j_idx], age_labels[i_idx][j_idx], symbls[i_idx][j_idx])
+            if ((i_idx, j_idx) == (0, 1)) or ((i_idx, j_idx) == (1,1)):
+                ylims = j.get_ylim()
+                yt = j.get_yticks()
+                y2 = j.twinx()
+                y2.set_ylim(ylims)
+                y2.set_yticks(yt)
+                yl = []
+                for j in yt:
+                    yl.append('{:5.2f}'.format(13.5795 - mth.asinh((j / 1.4424957031) ** (-3. / 2.)) / 0.0969815))
+                y2.set_yticklabels(yl) 
     plt.show()
             
