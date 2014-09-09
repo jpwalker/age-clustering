@@ -98,13 +98,13 @@ if __name__ == '__main__':
     fixed_transition_model = 300.
     cosmo = {'omega_M_0': 0.25, 'omega_lambda_0': 0.75, 'omega_b_0': 0.045, \
              'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0} # INPUT
-    zs = [6.196857, 4.179475, 2.0700316, 0.98870987, 0] #INPUT
-    z_points = ['o', '^', 'v', 's', 'p'] ##Predefined points for redshift
-    snaps = [22, 27, 36, 45, 67]
+    zs = (6.196857, 4.179475, 2.0700316, 0.98870987, 0) #INPUT
+    z_points = ('o', '^', 'v', 's', 'p') ##Predefined points for redshift
+    snaps = (22, 27, 36, 45, 67)
     home = '{0}/'.format(os.environ['HOME'])
     snap_identifier = '-1'
     (nu_no_age, bias_no_age)  = cmpn.calc_seljak_warren(1000, cosmo)
-    col_j = ['k', 'b', 'c', 'g', 'm', 'r'] ##Predefined colors for age_i
+    col_j = ('k', 'b', 'c', 'g', 'm', 'r') ##Predefined colors for age_i
     p1 = np.empty(len(snaps), dtype = np.object)
     #Properties for the mass-age sample across all redshifts
     best_fits = []
@@ -117,7 +117,7 @@ if __name__ == '__main__':
         z = zs[t]
         pnt = z_points[t]
         finaldir = '{0}Desktop/age-clustering-data/snap{1}{2}/attempt1_sub_form_jp/'.format(home, s, snap_identifier) ##INPUT
-        agelabel = 'Sub-Max_Tree-Form. Age' ##INPUT ##Label for age definition
+        agelabel = 'Sub-Max-Form. Age' ##INPUT ##Label for age definition
         nu_res = cmpn.nu_eff(finaldir, range(0, 6), range(1, 8), cosmo, z, nu_no_age, bias_no_age)
         for age_i in range(1, 6): #Step through mass_i and enumerate the age
             tot_agei = np.empty(0, dtype= int)

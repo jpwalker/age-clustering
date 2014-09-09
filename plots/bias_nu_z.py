@@ -10,6 +10,7 @@ from compute_nu import *
 import matplotlib.pyplot as plt
 from matplotlib import rc
 from matplotlib import rcdefaults
+from matplotlib import axes
 import os
 
 def plot_seljak_warren(M_low, M_high, cosmo):
@@ -24,20 +25,26 @@ def plot_seljak_warren(M_low, M_high, cosmo):
 
 if __name__ == '__main__':
     h = 0.73
-    snaps = [22, 27, 36, 45, 67]
+    snaps = (22, 27, 36, 45, 67)
+    symbs = ('o', '^', 'v', 's', 'p')
     snap_id = '-1'
-    z = [6.196857, 4.179475, 2.0700316, 0.98870987, 0] #Update the redshift
+    z = (6.196857, 4.179475, 2.0700316, 0.98870987, 0) #Update the redshift
+    ##Create figure and axes to create both the regular plot and the subpanel
+    fig = plt.figure()
+    st_ax = fig.add_axes([0.1, 0.1, 0.85, 0.85])
+    sp_ax = fig.add_axes([0.17, 0.45, 0.40, 0.45])
     #Cosmology for MS and MS2
     cosmo = {'omega_M_0': 0.25, 'omega_lambda_0': 0.75, 'omega_b_0': 0.045, \
              'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0} 
     massconv = 6.885e6 #Mass conversion reports mass in M_sun/h
     home = '{0}/'.format(os.environ['HOME'])
     (nu, b) = plot_seljak_warren(10, 15.45, cosmo)
-    plt.plot(nu, b, 'k--')
+    st_ax.plot(nu, b, 'k--')
+    sp_ax.plot(nu, b, 'k--')
     age_bins = 5
     mass_bins = 7
     ifile = 'properties.dat'
-    agelabel = 'Sub-Max_tree-Form. Age'
+    agelabel = 'Sub-Max-Form. Age'
     for (i, s) in enumerate(snaps):
         snap_dir = 'snap{0}{1}'.format(s, snap_id)
         direc = '{0}Desktop/age-clustering-data/{1}/attempt1_sub_form_jp/'.format(home, snap_dir)
@@ -54,11 +61,16 @@ if __name__ == '__main__':
                 mass.append(data[4][idx2][0])
             bias = np.array(bias)
             mass = np.array(mass)
-            plt.plot(compute_nu(mass * massconv / h, z[i], cosmo), bias, '*', color = col_j[age_i], \
-                     label = '{0}_{1}_{2}'.format(agelabel, age_i, z[i]))
+            st_ax.plot(compute_nu(mass * massconv / h, z[i], cosmo), bias, symbs[i], color = col_j[age_i], \
+                     label = '{0}, Q: {1}, z:{2}'.format(agelabel, age_i, z[i]))
+            sp_ax.plot(compute_nu(mass * massconv / h, z[i], cosmo), bias, symbs[i], color = col_j[age_i])
+    sp_ax.set_xlim([0.3, 1.22])
+    sp_ax.set_ylim([0.25, 1.75])
+    st_ax.set_xlim([0.3, 3.1])
+    st_ax.set_ylim([0.25, 8.5])
     rc('text', usetex = True)
-    plt.xlabel('$\\nu$')
-    plt.ylabel('$b$')
+    st_ax.set_xlabel('$\\nu$')
+    st_ax.set_ylabel('$b$')
+    #st_ax.legend()
     rcdefaults()
-    #plt.legend()
     plt.show()
