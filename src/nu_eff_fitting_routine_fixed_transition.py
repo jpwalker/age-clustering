@@ -113,7 +113,6 @@ if __name__ == '__main__':
     fit_nueff = np.empty(0, dtype = float)
     fig = plt.figure()
     ax = Axes3D(fig)
-    print(ax)
     for (t, s) in enumerate(snaps): #Step through redshift
         z = zs[t]
         pnt = z_points[t]
@@ -140,7 +139,7 @@ if __name__ == '__main__':
                     tot_nueff = np.append(tot_nueff, nu_res[4][idx])
                     tot_z = np.append(tot_z, t) #this is the index of the redshift for this sample
             #p1[t] = ax1.plot(tot_nu, tot_nueff, '{0}{1}'.format(pnt, color))[0]
-            ax.scatter3D(fit_age, fit_nu, fit_nueff, marker = pnt, c = color)
+            ax.scatter3D(tot_age, tot_nu, tot_nueff, marker = pnt, c = color)
             fit_age = np.append(fit_age, tot_age)
             fit_nu = np.append(fit_nu, tot_nu)
             fit_nueff = np.append(fit_nueff, tot_nueff)
@@ -148,12 +147,14 @@ if __name__ == '__main__':
     bf = best_fits[-1]
     plot_best_fit(ax, bf[0])
     ax.set_xlim([-0.5, 0.5])
+    ax.set_ylim([0.1, 3.4])
+    ax.set_zlim([-0.5, 3])
     ax.set_xlabel('age')
     ax.set_ylabel('nu')
     ax.set_zlabel('nu_eff')
     plt.show()
     for i in best_fits:
-        i[0]
+        print(i[0])
 #     plt.legend(p1, zs, bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.)
 #     plt.xlabel('(age - <age>) / <age>')
 #     plt.ylabel('nu_eff')
