@@ -147,6 +147,7 @@ if __name__ == '__main__':
     best_fits.append(leastsq(fitting_func1, (0.01, 10., 5., 0.01, 10., 5.), args = (fit_nu, fit_nueff, fit_age)))
     bf = best_fits[-1]
     plot_best_fit(ax, bf[0])
+    ax.set_xlim([-0.5, 0.5])
     ax.set_xlabel('age')
     ax.set_ylabel('nu')
     ax.set_zlabel('nu_eff')
