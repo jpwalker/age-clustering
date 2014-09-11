@@ -5,7 +5,7 @@ Fit nu_eff(nu) with a fixed transition in the break off.
 '''
 
 import matplotlib.pyplot as plt
-import pylab
+from matplotlib import rc
 from mpl_toolkits.mplot3d import Axes3D
 
 import numpy as np
@@ -24,7 +24,7 @@ def fitting_func1((A, B, C, D, E, F), ls, rs, ages):
         try:
             trans = D * exp(E * ages[i]) + F
         except OverflowError:
-            trans = 500.
+            trans = 5000.
         try:
             e = exp(-trans * x)
         except OverflowError:
@@ -112,7 +112,9 @@ if __name__ == '__main__':
     fit_nu = np.empty(0, dtype = float)
     fit_nueff = np.empty(0, dtype = float)
     fig = plt.figure()
-    ax = Axes3D(fig)
+    ax1 = fig.add_subplot(131, projection = '3d')
+    ax2 = fig.add_subplot(132, projection = '3d')
+    ax3 = fig.add_subplot(133, projection = '3d')
     for (t, s) in enumerate(snaps): #Step through redshift
         z = zs[t]
         pnt = z_points[t]
@@ -139,22 +141,39 @@ if __name__ == '__main__':
                     tot_nueff = np.append(tot_nueff, nu_res[4][idx])
                     tot_z = np.append(tot_z, t) #this is the index of the redshift for this sample
             #p1[t] = ax1.plot(tot_nu, tot_nueff, '{0}{1}'.format(pnt, color))[0]
-            ax.scatter3D(tot_age, tot_nu, tot_nueff, marker = pnt, c = color)
+            ax1.scatter3D(tot_age, tot_nu, tot_nueff, marker = pnt, c = color)
+            ax2.scatter3D(tot_age, tot_nu, tot_nueff, marker = pnt, c = color)
+            ax3.scatter3D(tot_age, tot_nu, tot_nueff, marker = pnt, c = color)
             fit_age = np.append(fit_age, tot_age)
             fit_nu = np.append(fit_nu, tot_nu)
             fit_nueff = np.append(fit_nueff, tot_nueff)
     best_fits.append(leastsq(fitting_func1, (0.01, 10., 5., 0.01, 10., 5.), args = (fit_nu, fit_nueff, fit_age)))
     bf = best_fits[-1]
-    plot_best_fit(ax, bf[0])
-    ax.set_xlim([-0.5, 0.5])
-    ax.set_ylim([0.1, 3.4])
-    ax.set_zlim([-0.5, 3])
-    ax.set_xlabel('age')
-    ax.set_ylabel('nu')
-    ax.set_zlabel('nu_eff')
+    plot_best_fit(ax1, bf[0])
+    plot_best_fit(ax2, bf[0])
+    plot_best_fit(ax3, bf[0])
+    ax1.set_xlim([-0.5, 0.5])
+    ax1.set_ylim([0.1, 3.4])
+    ax1.set_zlim([-0.5, 3])
+    ax2.set_xlim([-0.5, 0.5])
+    ax2.set_ylim([0.1, 3.4])
+    ax2.set_zlim([-0.5, 3])
+    ax3.set_xlim([-0.5, 0.5])
+    ax3.set_ylim([0.1, 3.4])
+    ax3.set_zlim([-0.5, 3])
+    rc('text', usetex = True)
+    ax1.set_xlabel('\\alpha')
+    ax1.set_ylabel('\\nu')
+    ax1.set_zlabel('$\\nu_\\textrm{eff}$')
+    ax2.set_xlabel('\\alpha')
+    ax2.set_ylabel('\\nu')
+    ax2.set_zlabel('$\\nu_\\textrm{eff}$')
+    ax3.set_xlabel('\\alpha')
+    ax3.set_ylabel('\\nu')
+    ax3.set_zlabel('$\\nu_\\textrm{eff}$')
     plt.show()
     for i in best_fits:
-        print(i[0])
+        print(i)
 #     plt.legend(p1, zs, bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.)
 #     plt.xlabel('(age - <age>) / <age>')
 #     plt.ylabel('nu_eff')
