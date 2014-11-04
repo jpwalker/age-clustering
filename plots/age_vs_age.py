@@ -44,7 +44,7 @@ if __name__ == '__main__':
     age1 = np.array(get_col_halo_table(halos, agekeys[0]))
     age2 = np.array(get_col_halo_table(halos, agekeys[1]))
     z = np.histogram2d(age1, age2, bins = [num_xbins, num_ybins])
-    print(z[0],z[1],z[2])
+    print(z[1])
     xcenters = find_centers(z[1])
     ycenters = find_centers(z[2])
     x = np.zeros_like(z[0])
