@@ -29,9 +29,9 @@ def plot_percentiles(data, numbins, xlim, ylim, vert = True, color = 'k', linest
 
 if __name__ == '__main__':
     home = '{0}/'.format(os.environ['HOME'])
-    direc = '{0}Desktop/age-clustering-data/'.format(home)
-    age_file = ('attempt1millenniumIIsnap67_1057_fof.txt', \
-                'attempt1millenniumIIsnap67_1057_sub.txt')
+    direc = '{0}Desktop/age-clustering-data/snap{1}/'.format(home, '67-1')
+    age_file = ('attempt1millenniumIIsnap67_500_fof.txt', \
+                'attempt1millenniumIIsnap67_500_sub.txt')
     age_file = age_file[1]
     agekeys = ['assem_jp', 'assem_gao']
     lbls = ['Sub-Max_tree-Assem. Age', 'Sub-Root-Assem. Age']
@@ -44,6 +44,7 @@ if __name__ == '__main__':
     age1 = np.array(get_col_halo_table(halos, agekeys[0]))
     age2 = np.array(get_col_halo_table(halos, agekeys[1]))
     z = np.histogram2d(age1, age2, bins = [num_xbins, num_ybins])
+    print(z[0],z[1],z[2])
     xcenters = find_centers(z[1])
     ycenters = find_centers(z[2])
     x = np.zeros_like(z[0])
