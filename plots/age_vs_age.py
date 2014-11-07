@@ -4,7 +4,7 @@ Created on Sep 17, 2013
 @author: jpwalker
 '''
 
-#from Correlation_Func import read_corr_file, calc_bias_cross
+from Correlation_Func import read_corr_file, calc_bias_cross, average_bias
 from MillenniumII import *
 import matplotlib.pyplot as plt
 import numpy.random as rnd
@@ -21,15 +21,17 @@ def find_centers(xedges):
     else:
         raise ValueError('Number of edges has to be greater than 2')
 
-def plot_percentiles(data, numbins, xlim, ylim, vert = True, color = 'k', linestyle = 'solid', linew = 2):
+def plot_percentiles(data, numbins, xlim, ylim, vert = True, color = 'k', 
+                     linestyle = 'solid', linew = 2):
     perc = 1. / numbins
     p = []
-    for i in range(1, numbins):
+    for i in range(0, numbins + 1):
         p.append(sts.scoreatpercentile(data, i * perc * 100.))
-        if vert:
-            plt.vlines(p[-1], ylim[0], ylim[1], color, linestyle, linewidth = linew)
-        else:
-            plt.hlines(p[-1], xlim[0], xlim[1], color, linestyle, linewidth = linew)
+        if (i != 0 and i != numbins): 
+            if vert:
+                plt.vlines(p[-1], ylim[0], ylim[1], color, linestyle, linewidth = linew)
+            else:
+                plt.hlines(p[-1], xlim[0], xlim[1], color, linestyle, linewidth = linew)
     return p
 
 if __name__ == '__main__':
@@ -41,8 +43,9 @@ if __name__ == '__main__':
     agekeys = ['form_jp', 'form_jp']
     lbls = ['Sub-Max_Tree-Form. Age', 'FOF-Max_tree-Form. Age']
     xi_m_m = '{0}{1}'.format(direc, 'xi_m_m_67.txt')
-    num_xbins = 50 #Number of bins on x axis. This is used for contour plot.
-    num_ybins = 50 #Number of bins on y axis. This is used for contour plot.
+    xi_halos = '{0}{1}'.format(direc, 'attempt1_sub_form_jp/xi_attempt1millenniumII_sub.txt')
+    num_xbins = 30 #Number of bins on x axis. This is used for contour plot.
+    num_ybins = 30 #Number of bins on y axis. This is used for contour plot.
     fmt = 'x,x,x,x,x,x,x,7,8,9,x,x,x,17,x,21,22,23,24,27,25,28,26,29'
     halos1 = read_halo_table_ascii('{0}{1}'.format(direc, age_file[0]), \
                                   fmt = fmt)
@@ -62,27 +65,37 @@ if __name__ == '__main__':
 #     if rng[0] == float('-inf'):
 #         rng[0] = 0.0001
 #     lvls = np.linspace(0.35 * (rng[1] - rng[0]) + rng[0], rng[1], 15)
-    plt.contour(x, y, np.log10(z[0]), colors = 'k', levels = [2,3,4,5,6])
+    plt.contour(x, y, z[0], colors = 'k', 
+                levels = [100, 500,1000, 5000, 10000, 50000, 100000, 500000])
     xl = plt.xlim()
     yl = plt.ylim()
     x_perc = plot_percentiles(age1, 5, xl, yl, color = 'r')
     y_perc = plot_percentiles(age2, 5, xl, yl, False, color = 'r')
-    
-    #Load xi_m_m
-    xi_m_m_d = read_corr_file(xi_m_m)
-    
-    ##Select halos in each age bin
-    idx = np.where(np.logical_and(age1 >= x_perc[-1], age2 < y_perc[0]))[0]
-    if len(idx) != 0:
-        sel_halos = select_halo_table(halos1, idx)
-        bias = calc_bias_cross(sel_halos, halos1, xi_m_m_d, MS2 = True)
     plt.xlabel(lbls[0])
     plt.ylabel(lbls[1])
     plt.show()
-    plt.plot(bias[0] / h, bias[1])
-    plt.xlim([5, 15])
-    plt.xlabel('r (Mpc)')
-    plt.ylabel('b')
-    plt.show()
+    
+    #Load xi_m_m and xi_halos
+    xi_m_m_d = read_corr_file(xi_m_m)
+    xi_halos_d = read_corr_file(xi_halos)
+    
+    for i in range(5):
+        for j in range(5):       
+    ##Select halos in each age bin
+            test1 = np.logical_and(age1 >= x_perc[i], age1 < x_perc[i + 1])
+            test2 = np.logical_and(age2 >= y_perc[j], age2 < y_perc[j + 1])
+            idx = np.where(np.logical_and(test1, test2))[0]
+            if len(idx) != 0:
+                sel_halos = select_halo_table(halos1, idx)
+            bias = calc_bias_cross(sel_halos, halos1, xi_m_m_d, 
+                               xi_auto_halos = xi_halos_d, MS2 = True)
+            st = '{0} <= age1 < {1}; {2} <= age2 < {3}; bias: {4}'
+            print(st.format(x_perc[i], x_perc[i + 1], y_perc[j], y_perc[j + 1], 
+                       average_bias(bias, 5, 15)))
+    
+#     plt.plot(bias[0] / h, bias[1])
+#     plt.xlim([5, 15])
+#     plt.xlabel('r (Mpc)')
+#     plt.ylabel('b')
     
     
