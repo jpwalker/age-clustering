@@ -59,7 +59,7 @@ if __name__ == '__main__':
     ycenters = find_centers(z[2])
     (y, x) = np.meshgrid(xcenters, ycenters)
     #idx = np.where(age1 > age2)
-    plt.plot(age1, age2, '*', markersize = 0.9, color = 'k', alpha = 0.1)
+    #plt.plot(age1, age2, '*', markersize = 0.9, color = 'k', alpha = 0.1)
 #     rng = [min(np.reshape(np.log10(z[0]), num_xbins * num_ybins)), 
 #            max(np.reshape(np.log10(z[0]), num_xbins * num_ybins))]
 #     if rng[0] == float('-inf'):
@@ -73,6 +73,7 @@ if __name__ == '__main__':
     y_perc = plot_percentiles(age2, 5, xl, yl, False, color = 'r')
     plt.xlabel(lbls[0])
     plt.ylabel(lbls[1])
+    plt.imshow(z[0], origin = 'lower', extent = (xl[0], xl[1], yl[0], yl[1]))
     plt.show()
     
     #Load xi_m_m and xi_halos
