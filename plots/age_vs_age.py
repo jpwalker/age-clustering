@@ -55,6 +55,8 @@ if __name__ == '__main__':
     age1 = np.array(get_col_halo_table(halos1, agekeys[0]))
     age2 = np.array(get_col_halo_table(halos2, agekeys[1]))
     z = np.histogram2d(age1, age2, bins = [num_xbins, num_ybins])
+    xl = (np.min(z[1]), np.max(z[1]))
+    yl = (np.min(z[2]), np.max(z[2]))
     xcenters = find_centers(z[1])
     ycenters = find_centers(z[2])
     (y, x) = np.meshgrid(xcenters, ycenters)
@@ -66,42 +68,44 @@ if __name__ == '__main__':
 #         rng[0] = 0.0001
 #     lvls = np.linspace(0.35 * (rng[1] - rng[0]) + rng[0], rng[1], 15)
     plt.contour(x, y, z[0], colors = 'k', 
-                levels = [100, 500, 1000, 5000, 10000, 50000])
-    xl = plt.xlim()
-    yl = plt.ylim()
+                levels = [100, 250, 500, 750, 1000])
+    plt.xlim(xl[0], xl[1])
+    plt.ylim(yl[0], yl[1])
     x_perc = plot_percentiles(age1, 5, xl, yl, color = 'r')
     y_perc = plot_percentiles(age2, 5, xl, yl, False, color = 'r')
     plt.xlabel(lbls[0])
     plt.ylabel(lbls[1])
-    plt.imshow(z[0], origin = 'lower', extent = (xl[0], xl[1], yl[0], yl[1]))
+    plt.imshow(z[0], origin = 'lower', extent = (xl[0], xl[1], yl[0], yl[1]), 
+               cmap = 'YlOrRd', vmin = 1000)
+    plt.colorbar()
     
     #Load xi_m_m and xi_halos
     xi_m_m_d = read_corr_file(xi_m_m)
     xi_halos_d = read_corr_file(xi_halos)
     
-    bias_img = np.zeros((1000, 1000))
-    for i in range(5):
-        for j in range(5):       
-    ##Select halos in each age bin
-            test1 = np.logical_and(age1 >= x_perc[i], age1 < x_perc[i + 1])
-            test2 = np.logical_and(age2 >= y_perc[j], age2 < y_perc[j + 1])
-            idx = np.where(np.logical_and(test1, test2))[0]
-            if len(idx) != 0:
-                sel_halos = select_halo_table(halos1, idx)
-            bias = calc_bias_cross(sel_halos, halos1, xi_m_m_d, 
-                               xi_auto_halos = xi_halos_d, MS2 = True)
-            avg_bias = average_bias(bias, 5, 15)
-            (left, right) = ((x_perc[i] - xl[0]) / (xl[1] - xl[0]) * 999., 
-                             (x_perc[i + 1] - xl[0]) / (xl[1] - xl[0]) * 999.)
-            (down, up) = ((y_perc[j] - yl[0]) / (yl[1] - yl[0]) * 999., 
-                          (y_perc[j + 1] - yl[0]) / (yl[1] - yl[0]) * 999.)
-            bias_img[down:up, left:right] = avg_bias
-            st = '{0} <= age1 < {1}; {2} <= age2 < {3}; bias: {4}'
-            print(st.format(x_perc[i], x_perc[i + 1], y_perc[j], y_perc[j + 1], 
-                       avg_bias))
-    plt.imshow(bias_img, origin = 'lower', extent = (xl[0], xl[1], yl[0], yl[1]), 
-               cmap = 'binary', alpha = 0.05)
-    plt.colorbar()
+#     bias_img = np.zeros((1000, 1000))
+#     for i in range(5):
+#         for j in range(5):       
+#     ##Select halos in each age bin
+#             test1 = np.logical_and(age1 >= x_perc[i], age1 < x_perc[i + 1])
+#             test2 = np.logical_and(age2 >= y_perc[j], age2 < y_perc[j + 1])
+#             idx = np.where(np.logical_and(test1, test2))[0]
+#             if len(idx) != 0:
+#                 sel_halos = select_halo_table(halos1, idx)
+#             bias = calc_bias_cross(sel_halos, halos1, xi_m_m_d, 
+#                                xi_auto_halos = xi_halos_d, MS2 = True)
+#             avg_bias = average_bias(bias, 5, 15)
+#             (left, right) = (float(x_perc[i] - xl[0]) / (xl[1] - xl[0]) * 999., 
+#                              (x_perc[i + 1] - xl[0]) / (xl[1] - xl[0]) * 999.)
+#             (down, up) = (float(y_perc[j] - yl[0]) / (yl[1] - yl[0]) * 999., 
+#                           (y_perc[j + 1] - yl[0]) / (yl[1] - yl[0]) * 999.)
+#             bias_img[down:up, left:right] = avg_bias
+#             st = '{0} <= age1 < {1}; {2} <= age2 < {3}; bias: {4}'
+#             print(st.format(x_perc[i], x_perc[i + 1], y_perc[j], y_perc[j + 1], 
+#                        avg_bias))
+#     plt.imshow(bias_img, origin = 'lower', extent = (xl[0], xl[1], yl[0], yl[1]), 
+#                cmap = 'binary', alpha = 0.2)
+    #plt.colorbar()
     plt.show()
 #     plt.plot(bias[0] / h, bias[1])
 #     plt.xlim([5, 15])
