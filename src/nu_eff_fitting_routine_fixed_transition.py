@@ -92,15 +92,15 @@ def plot_best_fit(axis, (A, B, C, D, E, F)):
     mesh = np.meshgrid(np.arange(low_age, high_age, age_step), 
                        np.arange(low_nu, high_nu, nu_step))
     z = surface_vals(mesh[0], mesh[1], (A, B, C, D, E, F))
-    axis.plot_wireframe(mesh[0], mesh[1], z)
+    axis.plot_wireframe(mesh[0], mesh[1], z, alpha = .2)
     
 if __name__ == '__main__':
-    fixed_transition_model = 300.
+    #fixed_transition_model = 300.
     cosmo = {'omega_M_0': 0.25, 'omega_lambda_0': 0.75, 'omega_b_0': 0.045, \
              'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0} # INPUT
-    zs = (6.196857, 4.179475, 2.0700316, 0.98870987, 0) #INPUT
-    z_points = ('o', '^', 'v', 's', 'p') ##Predefined points for redshift
-    snaps = (22, 27, 36, 45, 67)
+    zs = (6.196857, 4.179475, 2.0700316, 1.5036374, 0.98870987, 0.5641763, 0) #INPUT
+    z_points = ('o', '^', 'v', 'D', 's', '*', 'p') ##Predefined points for redshift
+    snaps = (22, 27, 36, 40, 45, 51, 67)
     home = '{0}/'.format(os.environ['HOME'])
     snap_identifier = '-1'
     (nu_no_age, bias_no_age)  = cmpn.calc_seljak_warren(1000, cosmo)
@@ -112,9 +112,9 @@ if __name__ == '__main__':
     fit_nu = np.empty(0, dtype = float)
     fit_nueff = np.empty(0, dtype = float)
     fig = plt.figure()
-    axi = [fig.add_subplot(131, projection = '3d'), 
+    axi = (fig.add_subplot(131, projection = '3d'), 
            fig.add_subplot(132, projection = '3d'), 
-           fig.add_subplot(133, projection = '3d')] 
+           fig.add_subplot(133, projection = '3d')) 
     for (t, s) in enumerate(snaps): #Step through redshift
         z = zs[t]
         pnt = z_points[t]

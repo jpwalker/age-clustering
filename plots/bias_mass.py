@@ -15,12 +15,12 @@ if __name__ == '__main__':
     h = 0.73
     massconv = 6.885E6 #Mass conversion reports mass in M_sun/h
     home = '{0}/'.format(os.environ['HOME'])
-    direc = '{0}Desktop/age-clustering-data/snap67/attempt1_fof_form_gao/'.format(home)
+    direc = '{0}Desktop/age-clustering-data/snap67-1/attempt1_sub_assem_jp/'.format(home)
     ifile = 'properties.dat'
-    agelabel = 'Sub-Root-Assem. Age'
-    data = readfile('{0}{1}'.format(direc, ifile), col = 28, delim = ' ', skip = 1)
+    agelabel = 'Sub-Assem. Age-Max'
+    data = readfile('{0}{1}'.format(direc, ifile), col = 28, delim = '    ', skip = 1)
     age_bins = 5
-    mass_bins = 7
+    mass_bins = 8
     col_j = ['k', 'b', 'c', 'g', 'm', 'r'] #Colors of Age bins that are plotted
     for age_i in range(0, age_bins + 1):
         bias = []

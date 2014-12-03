@@ -30,12 +30,12 @@ if __name__ == '__main__':
              'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0} 
     massconv = 6.885e6 #Mass conversion reports mass in M_sun/h
     home = '{0}/'.format(os.environ['HOME'])
-    direc = '{0}Desktop/age-clustering-data/snap67/attempt1_sub_form_jp/'.format(home)
+    direc = '{0}Desktop/age-clustering-data/snap67-1/attempt1_sub_form_jp/'.format(home)
     ifile = 'properties.dat'
     agelabel = 'Sub-Max_tree-Form. Age'
     data = readfile('{0}{1}'.format(direc, ifile), col = 28, delim = '    ', skip = 1)
     age_bins = 5
-    mass_bins = 7
+    mass_bins = 8
     (nu, b) = plot_seljak_warren(9, 13, cosmo)
     plt.plot(nu, b, 'k--')
     col_j = ['k', 'b', 'c', 'g', 'm', 'r'] #Colors of Age bins that are plotted

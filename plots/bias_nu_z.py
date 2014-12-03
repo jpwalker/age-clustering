@@ -25,10 +25,10 @@ def plot_seljak_warren(M_low, M_high, cosmo):
 
 if __name__ == '__main__':
     h = 0.73
-    snaps = (22, 27, 36, 45, 67)
-    symbs = ('o', '^', 'v', 's', 'p')
+    snaps = (22, 27, 36, 40, 45, 51, 67)
+    symbs = ('o', '^', 'v', 'D', 's', '*', 'p')
     snap_id = '-1'
-    z = (6.196857, 4.179475, 2.0700316, 0.98870987, 0) #Update the redshift
+    z = (6.196857, 4.179475, 2.0700316, 1.5036374, 0.98870987, 0.5641763, 0) #Update the redshift
     ##Create figure and axes to create both the regular plot and the subpanel
     fig = plt.figure()
     st_ax = fig.add_axes([0.1, 0.1, 0.85, 0.85])
@@ -38,7 +38,7 @@ if __name__ == '__main__':
              'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0} 
     massconv = 6.885e6 #Mass conversion reports mass in M_sun/h
     home = '{0}/'.format(os.environ['HOME'])
-    (nu, b) = plot_seljak_warren(10, 15.45, cosmo)
+    (nu, b) = plot_seljak_warren(9, 15.45, cosmo)
     st_ax.plot(nu, b, 'k--')
     sp_ax.plot(nu, b, 'k--')
     age_bins = 5
