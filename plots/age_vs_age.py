@@ -38,10 +38,10 @@ if __name__ == '__main__':
     h = 0.73
     home = '{0}/'.format(os.environ['HOME'])
     direc = '{0}Desktop/age-clustering-data/snap{1}/'.format(home, '67-1')
-    age_file = ('attempt1millenniumIIsnap67_500_sub.txt', \
+    age_file = ('attempt1millenniumIIsnap67_500_fof.txt', \
                 'attempt1millenniumIIsnap67_500_fof.txt')
-    agekeys = ['form_jp', 'form_jp']
-    lbls = ['Sub-Form. Age-Max', 'FOF-Form. Age-Max']
+    agekeys = ['form_jp', 'form_gao']
+    lbls = ['FOF-Form. Age-Max', 'FOF-Form. Age-Root']
     xi_m_m = '{0}{1}'.format(direc, 'xi_m_m_67.txt')
     xi_halos = '{0}{1}'.format(direc, 'attempt1_sub_form_jp/xi_attempt1millenniumII_sub.txt')
     num_xbins = 40 #Number of bins on x axis. This is used for contour plot.
