@@ -105,18 +105,19 @@ def s_plot(p, fnames, age_keys, age_labels, symbols):
         plot_redshift(p, redshifts, fof_np, age_labels, symbols)
             
 if __name__ == '__main__':
+    ident = '-1'
     home = '{0}/'.format(os.environ['HOME'])
-    direc = '{0}Desktop/age-clustering-data/snap67/'.format(home)
-    age_file = (('attempt1millenniumIIsnap67_1057_fof.txt', 
-                 'attempt1millenniumIIsnap67_1057_sub.txt'), 
-                ('attempt1millenniumIIsnap67_1057_fof.txt', 
-                 'attempt1millenniumIIsnap67_1057_sub.txt'))
+    direc = '{0}Desktop/age-clustering-data/snap67{1}/'.format(home, ident)
+    age_file = (('attempt1millenniumIIsnap67_500_fof.txt', 
+                 'attempt1millenniumIIsnap67_500_sub.txt'), 
+                ('attempt1millenniumIIsnap67_500_fof.txt', 
+                 'attempt1millenniumIIsnap67_500_sub.txt'))
     age_key = ((('form_gao', 'form_jp'), ('form_gao', 'form_jp')), 
                (('assem_gao', 'assem_jp'), ('assem_gao', 'assem_jp')))
-    age_labels = ((('FOF-Root-Form. Age', 'FOF-Max-Form. Age'), 
-                   ('Sub-Root-Form. Age', 'Sub-Max-Form. Age')), 
-                  (('FOF-Root-Assem. Age', 'FOF-Max-Assem. Age'), 
-                   ('Sub-Root-Assem. Age', 'Sub-Max-Assem. Age')))
+    age_labels = ((('FOF-Form. Age-Root', 'FOF-Form. Age-Max'), 
+                   ('Sub-Form. Age-Root', 'Sub-Form. Age-Max')), 
+                  (('FOF-Assem. Age-Root', 'FOF-Assem. Age-Max'), 
+                   ('Sub-Assem. Age-Root', 'Sub-Assem. Age-Max')))
     symbls = ((('s', '^'), ('s', '^')), (('s', '^'), ('s', '^')))
     h = 0.73
     massconv = 6.885e6 #Mass conversion reports mass in M_sun/h
@@ -124,13 +125,14 @@ if __name__ == '__main__':
     rc('text', usetex = True)
     ## Create figures and subplots
     (fig, ax) = plt.subplots(2, 2, True, True)
-    ## Axis Labels
-    fig.text(0.47, 0.03, "M $(\\mathrm{M}_\\odot)$")
+    ## Axis Labels 
+    fig.text(0.48, 0.03, "M $(\\mathrm{M}_\\odot)$")
     fig.text(0.972,0.62, 'Lookback time (Gyr)', rotation = 'vertical')
     fig.text(0.034, 0.53, "$z+1$", rotation = 'vertical')
     for (i_idx, i) in enumerate(ax):
         for (j_idx, j) in enumerate(i):
             s_plot(j, (age_file[i_idx][j_idx],), age_key[i_idx][j_idx], age_labels[i_idx][j_idx], symbls[i_idx][j_idx])
+            j.set_xlim([3.5E9, 1E15])
             if ((i_idx, j_idx) == (0, 1)) or ((i_idx, j_idx) == (1,1)):
                 ylims = j.get_ylim()
                 yt = j.get_yticks()
@@ -141,5 +143,6 @@ if __name__ == '__main__':
                 for j in yt:
                     yl.append('{:5.2f}'.format(13.5795 - mth.asinh((j / 1.4424957031) ** (-3. / 2.)) / 0.0969815))
                 y2.set_yticklabels(yl) 
+    
     plt.show()
             
