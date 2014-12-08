@@ -61,9 +61,16 @@ if __name__ == '__main__':
                 mass.append(data[4][idx2][0])
             bias = np.array(bias)
             mass = np.array(mass)
-            st_ax.plot(compute_nu(mass * massconv / h, z[i], cosmo), bias, symbs[i], color = col_j[age_i], \
-                     label = '{0}, Q: {1}, z:{2}'.format(agelabel, age_i, z[i]))
-            sp_ax.plot(compute_nu(mass * massconv / h, z[i], cosmo), bias, symbs[i], color = col_j[age_i])
+            if symbs[i] == 'p' or symbs[i] == '*':
+                symsize = 5.
+            else:
+                symsize = 4.  
+            st_ax.plot(compute_nu(mass * massconv / h, z[i], cosmo), bias, symbs[i], 
+                       color = col_j[age_i], 
+                       label = '{0}, Q: {1}, z:{2}'.format(agelabel, age_i, z[i]), 
+                       ms = symsize)
+            sp_ax.plot(compute_nu(mass * massconv / h, z[i], cosmo), bias, symbs[i], 
+                       color = col_j[age_i], ms = symsize)
     sp_ax.set_xlim([0.3, 1.22])
     sp_ax.set_ylim([0.25, 1.75])
     st_ax.set_xlim([0.3, 3.1])
