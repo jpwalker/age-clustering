@@ -54,6 +54,10 @@ if __name__ == '__main__':
     print 'File read...Ploting...'
     age1 = np.array(get_col_halo_table(halos1, agekeys[0]))
     age2 = np.array(get_col_halo_table(halos2, agekeys[1]))
+    ## Statistics of the ages
+    print('age1 == age2: {0}'.format(float(len(np.where(age1 == age2)[0])) / len(age1)))
+    print('age1 < age2: {0}'.format(float(len(np.where(age1 < age2)[0])) / len(age1)))
+    print('age1 > age2: {0}'.format(float(len(np.where(age1 > age2)[0])) / len(age1)))
     z = np.histogram2d(age2, age1, bins = [num_xbins, num_ybins])
     xl = (np.min(z[1]), np.max(z[1]))
     yl = (np.min(z[2]), np.max(z[2]))
