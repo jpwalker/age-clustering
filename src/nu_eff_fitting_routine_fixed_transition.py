@@ -14,7 +14,8 @@ import compute_nu_eff as cmpn
 from scipy.optimize import leastsq
 from math import exp
 
-def fitting_func1((A, B, C, D, E, F), ls, rs, ages):
+def fitting_func1((A, B, C), ls, rs, ages):
+    trans = 1000.
     nu0 = A * np.exp(B * ages) + C
     #ls =nu and rs=nu_eff
     ret = []
@@ -22,13 +23,10 @@ def fitting_func1((A, B, C, D, E, F), ls, rs, ages):
         x = ls[i] - nu0[i]
         y = rs[i] - nu0[i]
         try:
-            trans = D * exp(E * ages[i]) + F
-        except OverflowError:
-            trans = 5000.
-        try:
             e = exp(-trans * x)
         except OverflowError:
             e = 1E100
+            print('Overflow')
         ret.append(y - x / (1. + e))
     return ret
 
@@ -76,13 +74,13 @@ def index_nu_eff(data, a_i, m_i):
     ret = idx2.intersection(idx)
     return np.array(list(ret))
 
-def surface_vals(y, x, (A, B, C, D, E, F)):
+def surface_vals(y, x, (A, B, C)):
     nu0 = A * np.exp(B * y) + C
     x = x - nu0
-    trans = D * np.exp(E * x) + F
+    trans = 1000.
     return x / (1. + np.exp(-trans * x)) + nu0
  
-def plot_best_fit(axis, (A, B, C, D, E, F)):
+def plot_best_fit(axis, (A, B, C)):
     low_nu = 0.5
     nu_step = 0.05
     high_nu = 3 + nu_step
@@ -91,7 +89,7 @@ def plot_best_fit(axis, (A, B, C, D, E, F)):
     high_age = .5 + age_step
     mesh = np.meshgrid(np.arange(low_age, high_age, age_step), 
                        np.arange(low_nu, high_nu, nu_step))
-    z = surface_vals(mesh[0], mesh[1], (A, B, C, D, E, F))
+    z = surface_vals(mesh[0], mesh[1], (A, B, C))
     axis.plot_wireframe(mesh[0], mesh[1], z, alpha = .2)
     
 if __name__ == '__main__':
@@ -146,7 +144,7 @@ if __name__ == '__main__':
             fit_age = np.append(fit_age, tot_age)
             fit_nu = np.append(fit_nu, tot_nu)
             fit_nueff = np.append(fit_nueff, tot_nueff)
-    best_fits.append(leastsq(fitting_func1, (0.01, 10., 5., 0.01, 10., 5.), args = (fit_nu, fit_nueff, fit_age)))
+    best_fits.append(leastsq(fitting_func1, (0.01, 10., 5.), args = (fit_nu, fit_nueff, fit_age)))
     bf = best_fits[-1]
     for ax in axi:
         plot_best_fit(ax, bf[0])
