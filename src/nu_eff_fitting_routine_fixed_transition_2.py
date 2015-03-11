@@ -4,7 +4,7 @@ Fit nu_eff(nu) with a fixed transition in the break off.
 @author: jpwalker
 '''
 
-import matplotlib.pyplot as plt
+import matplotlib.pyplot aplt
 from matplotlib import rc
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np

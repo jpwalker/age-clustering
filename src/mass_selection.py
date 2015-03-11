@@ -1,7 +1,7 @@
 '''
 Created on Mar 24, 2014
 
-@author: jpwalker
+@author: jpwalkr
 '''
 
 import compute_nu as n 
