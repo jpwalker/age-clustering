@@ -4,7 +4,7 @@ Created on Aug 22, 2013
 @author: jpwalker
 '''
 
-from IO import *
+from IO import readfile
 import numpy as np
 from compute_nu import *
 import matplotlib.pyplot as plt
@@ -12,16 +12,7 @@ from matplotlib import rc
 from matplotlib import rcdefaults
 from matplotlib import axes
 import os
-
-def plot_seljak_warren(M_low, M_high, cosmo):
-    M = np.logspace(M_low, M_high, 1000)
-    M_star = compute_Mstar(0, cosmo)
-    x = M * 1.5 / M_star
-    b = 0.53 + 0.39 * x**0.45 + 0.13 / (40 * x + 1) + 5E-4 * x**1.5 + np.log10(x) * \
-    (0.4 * (cosmo['omega_M_0'] - 0.3 + cosmo['n'] - 1) + 0.3 * (cosmo['sigma_8'] - 0.9 + cosmo['h'] -.7))
-    
-    nu = compute_nu(M, 0, cosmo)
-    return (nu, b)
+from compute_nu_eff import calc_seljak_warren_w_cut
 
 if __name__ == '__main__':
     h = 0.73
@@ -38,7 +29,7 @@ if __name__ == '__main__':
              'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0} 
     massconv = 6.885e6 #Mass conversion reports mass in M_sun/h
     home = '{0}/'.format(os.environ['HOME'])
-    (nu, b) = plot_seljak_warren(9, 15.45, cosmo)
+    (nu, b) = calc_seljak_warren_w_cut(1000, 0.56, cosmo)
     st_ax.plot(nu, b, 'k--')
     sp_ax.plot(nu, b, 'k--')
     age_bins = 5
