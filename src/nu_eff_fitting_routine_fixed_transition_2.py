@@ -4,7 +4,7 @@ Fit nu_eff(nu) with a fixed transition in the break off.
 @author: jpwalker
 '''
 
-import matplotlib.pyplot aplt
+import matplotlib.pyplot as plt
 from matplotlib import rc
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
@@ -14,21 +14,18 @@ from scipy.optimize import leastsq
 from math import exp
 
 ##{f*x + g*(Exp[(x - B)] + B - 1
-def fitting_func1((A, B, C), ls, rs, ages):
+def fitting_func1((A, B, C, D, E, F), ls, rs, ages):
     nu0 = A * np.exp(B * ages) + C
+    m = D  * (ages - E) ** 2. + F
     #ls =nu and rs=nu_eff
     ret = []
     for i in range(len(ls)):
         x = ls[i] - nu0[i]
         y = rs[i] - nu0[i]
-        trans = 10.
-        try:
-            e = exp(-trans * x)
-        except OverflowError:
-            e = 1E100
-        f = 1. / (1. + e)
-        g = 1 - f
-        ret.append(y - (ls[i] * f + (g * exp(x) + nu0[i] - 1)))
+        if ls[i] <= nu0[i]:
+            ret.append(y - m[i] * x)
+        else:
+            ret.append(rs[i] - ls[i])
     return ret
 
 def index_nu_eff(data, a_i, m_i):
@@ -41,16 +38,21 @@ def index_nu_eff(data, a_i, m_i):
     ret = idx2.intersection(idx)
     return np.array(list(ret))
 
-def surface_vals(y, x, (A, B, C)):
+def surface_vals(y, x, (A, B, C, D, E, F)):
     nu0 = A * np.exp(B * y) + C
+    m = D  * (y - E) ** 2. + F
     x_n = x - nu0
-    trans = 10.
-    f = 1. / (1. + np.exp(-trans * x_n))
-    g = 1. - f 
-    return x * f + g * (np.exp(x_n) + nu0 - 1.)
+    z = np.zeros_like(x)
+    for (i, x_r_i) in enumerate(x):
+        for (j, x_i) in enumerate(x_r_i):
+            if x_i <= nu0[i][j]:
+                z[i][j] = m[i][j] * x_n[i][j] + nu0[i][j]
+            else:
+                z[i][j] = x_i  
+    return np.array(z)
 #f*x + g*(Exp[(x - B)] + B - 1 
 
-def plot_best_fit(axis, (A, B, C)):
+def plot_best_fit(axis, (A, B, C, D, E, F)):
     low_nu = 0.5
     nu_step = 0.05
     high_nu = 3 + nu_step
@@ -59,7 +61,7 @@ def plot_best_fit(axis, (A, B, C)):
     high_age = .5 + age_step
     mesh = np.meshgrid(np.arange(low_age, high_age, age_step), 
                        np.arange(low_nu, high_nu, nu_step))
-    z = surface_vals(mesh[0], mesh[1], (A, B, C))
+    z = surface_vals(mesh[0], mesh[1], (A, B, C, D, E, F))
     axis.plot_wireframe(mesh[0], mesh[1], z, alpha = .2)
     
 if __name__ == '__main__':
@@ -114,7 +116,7 @@ if __name__ == '__main__':
             fit_age = np.append(fit_age, tot_age)
             fit_nu = np.append(fit_nu, tot_nu)
             fit_nueff = np.append(fit_nueff, tot_nueff)
-    best_fits.append(leastsq(fitting_func1, (0.01, 10., 5.), args = (fit_nu, fit_nueff, fit_age)))
+    best_fits.append(leastsq(fitting_func1, (0.01, 10., 5., 1., 1., 0.), args = (fit_nu, fit_nueff, fit_age)))
     bf = best_fits[-1]
     for ax in axi:
         plot_best_fit(ax, bf[0])
