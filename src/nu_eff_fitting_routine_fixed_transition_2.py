@@ -4,7 +4,7 @@ Fit nu_eff(nu) with a fixed transition in the break off.
 @author: jpwalker
 '''
 
-import matplotlib.pyplot as plt
+import matplotlib.pyplot aplt
 from matplotlib import rc
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
@@ -31,27 +31,6 @@ def fitting_func1((A, B, C), ls, rs, ages):
         ret.append(y - (ls[i] * f + (g * exp(x) + nu0[i] - 1)))
     return ret
 
-def fitting_func3((A,), ls, rs, B1):
-    print A
-    #ls =nu and rs=nu_eff
-    ret = []
-    for i in range(len(ls)):
-        x = ls[i] - A
-        y = rs[i] - A
-        try:
-            e = exp(-B1 * x)
-        except OverflowError:
-            e = 1E100
-        ret.append(y - x / (1. + e))
-    return ret
-
-def param_fit_func((A, B, C), x, y):
-    print A, B, C
-    ret = np.zeros(len(x), dtype = np.float64)
-    for i in range(len(x)):
-        ret[i] = y[i] - (A * exp(B * x[i]) + C)
-    return ret
-
 def index_nu_eff(data, a_i, m_i):
     idx = set()
     idx2 = set()
@@ -62,13 +41,16 @@ def index_nu_eff(data, a_i, m_i):
     ret = idx2.intersection(idx)
     return np.array(list(ret))
 
-def surface_vals(y, x, (A, B, C, D, E, F)):
+def surface_vals(y, x, (A, B, C)):
     nu0 = A * np.exp(B * y) + C
-    x = x - nu0
-    trans = D * np.exp(E * x) + F
-    return x / (1. + np.exp(-trans * x)) + nu0
- 
-def plot_best_fit(axis, (A, B, C, D, E, F)):
+    x_n = x - nu0
+    trans = 10.
+    f = 1. / (1. + np.exp(-trans * x_n))
+    g = 1. - f 
+    return x * f + g * (np.exp(x_n) + nu0 - 1.)
+#f*x + g*(Exp[(x - B)] + B - 1 
+
+def plot_best_fit(axis, (A, B, C)):
     low_nu = 0.5
     nu_step = 0.05
     high_nu = 3 + nu_step
@@ -77,7 +59,7 @@ def plot_best_fit(axis, (A, B, C, D, E, F)):
     high_age = .5 + age_step
     mesh = np.meshgrid(np.arange(low_age, high_age, age_step), 
                        np.arange(low_nu, high_nu, nu_step))
-    z = surface_vals(mesh[0], mesh[1], (A, B, C, D, E, F))
+    z = surface_vals(mesh[0], mesh[1], (A, B, C))
     axis.plot_wireframe(mesh[0], mesh[1], z, alpha = .2)
     
 if __name__ == '__main__':
@@ -132,7 +114,7 @@ if __name__ == '__main__':
             fit_age = np.append(fit_age, tot_age)
             fit_nu = np.append(fit_nu, tot_nu)
             fit_nueff = np.append(fit_nueff, tot_nueff)
-    best_fits.append(leastsq(fitting_func1, (0.01, 10., 5., 0.01, 10., 5.), args = (fit_nu, fit_nueff, fit_age)))
+    best_fits.append(leastsq(fitting_func1, (0.01, 10., 5.), args = (fit_nu, fit_nueff, fit_age)))
     bf = best_fits[-1]
     for ax in axi:
         plot_best_fit(ax, bf[0])
