@@ -29,7 +29,7 @@ if __name__ == '__main__':
              'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0} 
     massconv = 6.885e6 #Mass conversion reports mass in M_sun/h
     home = '{0}/'.format(os.environ['HOME'])
-    (nu, b) = calc_seljak_warren_w_cut(1000, 0.56, cosmo)
+    (nu, b) = calc_seljak_warren_w_cut(1000, 0.65, cosmo)
     st_ax.plot(nu, b, 'k--')
     sp_ax.plot(nu, b, 'k--')
     age_bins = 5
