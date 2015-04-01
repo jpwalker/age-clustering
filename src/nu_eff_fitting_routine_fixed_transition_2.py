@@ -116,7 +116,9 @@ if __name__ == '__main__':
             fit_age = np.append(fit_age, tot_age)
             fit_nu = np.append(fit_nu, tot_nu)
             fit_nueff = np.append(fit_nueff, tot_nueff)
-    best_fits.append(leastsq(fitting_func1, (0.01, 10., 5., 1., 1., 0.), args = (fit_nu, fit_nueff, fit_age)))
+    best_fits.append(leastsq(fitting_func1, 
+                             np.array([0.01, 10., 5., 1., 1., 0.]), 
+                             args = (fit_nu, fit_nueff, fit_age), maxfev = 6000))
     bf = best_fits[-1]
     for ax in axi:
         plot_best_fit(ax, bf[0])
