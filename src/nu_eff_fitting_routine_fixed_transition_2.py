@@ -14,9 +14,9 @@ from scipy.optimize import leastsq
 from math import exp
 
 ##{f*x + g*(Exp[(x - B)] + B - 1
-def fitting_func1((A, B, C, D, E, F), ls, rs, ages):
+def fitting_func1((A, B, C, D, E), ls, rs, ages):
     nu0 = A * np.exp(B * ages) + C
-    m = D  * (ages - E) ** 2. + F
+    m = D  * ages + E
     #ls =nu and rs=nu_eff
     ret = []
     for i in range(len(ls)):
@@ -38,9 +38,9 @@ def index_nu_eff(data, a_i, m_i):
     ret = idx2.intersection(idx)
     return np.array(list(ret))
 
-def surface_vals(y, x, (A, B, C, D, E, F)):
+def surface_vals(y, x, (A, B, C, D, E, )):
     nu0 = A * np.exp(B * y) + C
-    m = D  * (y - E) ** 2. + F
+    m = D  * y + E
     x_n = x - nu0
     z = np.zeros_like(x)
     for (i, x_r_i) in enumerate(x):
@@ -117,7 +117,7 @@ if __name__ == '__main__':
             fit_nu = np.append(fit_nu, tot_nu)
             fit_nueff = np.append(fit_nueff, tot_nueff)
     best_fits.append(leastsq(fitting_func1, 
-                             np.array([0.01, 10., 5., 1., 1., 0.]), 
+                             np.array([0.01, 10., 5., 1., 1.]), 
                              args = (fit_nu, fit_nueff, fit_age), maxfev = 6000))
     bf = best_fits[-1]
     for ax in axi:
