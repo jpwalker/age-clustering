@@ -11,7 +11,6 @@ import numpy as np
 import os
 import compute_nu_eff as cmpn
 from scipy.optimize import leastsq
-from math import exp
 
 ##{f*x + g*(Exp[(x - B)] + B - 1
 def fitting_func1((A, B, C, D, E), ls, rs, ages):
@@ -38,7 +37,7 @@ def index_nu_eff(data, a_i, m_i):
     ret = idx2.intersection(idx)
     return np.array(list(ret))
 
-def surface_vals(y, x, (A, B, C, D, E, )):
+def surface_vals(y, x, (A, B, C, D, E)):
     nu0 = A * np.exp(B * y) + C
     m = D  * y + E
     x_n = x - nu0
@@ -52,7 +51,7 @@ def surface_vals(y, x, (A, B, C, D, E, )):
     return np.array(z)
 #f*x + g*(Exp[(x - B)] + B - 1 
 
-def plot_best_fit(axis, (A, B, C, D, E, F)):
+def plot_best_fit(axis, (A, B, C, D, E)):
     low_nu = 0.5
     nu_step = 0.05
     high_nu = 3 + nu_step
@@ -61,7 +60,7 @@ def plot_best_fit(axis, (A, B, C, D, E, F)):
     high_age = .5 + age_step
     mesh = np.meshgrid(np.arange(low_age, high_age, age_step), 
                        np.arange(low_nu, high_nu, nu_step))
-    z = surface_vals(mesh[0], mesh[1], (A, B, C, D, E, F))
+    z = surface_vals(mesh[0], mesh[1], (A, B, C, D, E))
     axis.plot_wireframe(mesh[0], mesh[1], z, alpha = .2)
     
 if __name__ == '__main__':
