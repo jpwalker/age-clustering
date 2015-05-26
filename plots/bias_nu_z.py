@@ -4,14 +4,12 @@ Created on Aug 22, 2013
 @author: jpwalker
 '''
 
+from numpy import logical_and, array, where
 from IO import readfile
-import numpy as np
-from compute_nu import *
-import matplotlib.pyplot as plt
-from matplotlib import rc
-from matplotlib import rcdefaults
-from matplotlib import axes
-import os
+from matplotlib.figure import Figure
+from matplotlib import rc, rcdefaults
+from compute_nu import compute_nu
+from os import environ
 from compute_nu_eff import calc_seljak_warren_w_cut
 
 if __name__ == '__main__':
@@ -21,14 +19,14 @@ if __name__ == '__main__':
     snap_id = '-1'
     z = (6.196857, 4.179475, 2.0700316, 1.5036374, 0.98870987, 0.5641763, 0) #Update the redshift
     ##Create figure and axes to create both the regular plot and the subpanel
-    fig = plt.figure()
+    fig = Figure()
     st_ax = fig.add_axes([0.1, 0.1, 0.85, 0.85])
     sp_ax = fig.add_axes([0.17, 0.45, 0.40, 0.45])
     #Cosmology for MS and MS2
     cosmo = {'omega_M_0': 0.25, 'omega_lambda_0': 0.75, 'omega_b_0': 0.045, \
              'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0} 
     massconv = 6.885e6 #Mass conversion reports mass in M_sun/h
-    home = '{0}/'.format(os.environ['HOME'])
+    home = '{0}/'.format(environ['HOME'])
     (nu, b) = calc_seljak_warren_w_cut(1000, 0.65, cosmo)
     st_ax.plot(nu, b, 'k--')
     sp_ax.plot(nu, b, 'k--')
@@ -46,12 +44,12 @@ if __name__ == '__main__':
             mass = []
             for mass_i in range(1, mass_bins + 1):
                 b_data = readfile('{0}bias/bias_{1}_{2}'.format(direc, mass_i, age_i), col = 2, delim = ',', skip = 1)
-                idx1 = np.where(np.logical_and(b_data[0] >= 5, b_data[0] <= 15))[0]
-                idx2 = np.where(np.logical_and(data[0] == mass_i, data[1] == age_i))[0]
-                bias.append(np.sum(b_data[1][idx1]) / len(b_data[1][idx1]))
+                idx1 = where(logical_and(b_data[0] >= 5, b_data[0] <= 15))[0]
+                idx2 = where(logical_and(data[0] == mass_i, data[1] == age_i))[0]
+                bias.append(sum(b_data[1][idx1]) / len(b_data[1][idx1]))
                 mass.append(data[4][idx2][0])
-            bias = np.array(bias)
-            mass = np.array(mass)
+            bias = array(bias)
+            mass = array(mass)
             if symbs[i] == 'p' or symbs[i] == '*':
                 symsize = 5.
             else:
@@ -71,4 +69,4 @@ if __name__ == '__main__':
     st_ax.set_ylabel('$b$')
     #st_ax.legend()
     rcdefaults()
-    plt.show()
+    fig.show()
