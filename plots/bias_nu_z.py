@@ -6,7 +6,7 @@ Created on Aug 22, 2013
 
 from numpy import logical_and, array, where
 from IO import readfile
-from matplotlib.figure import Figure
+from matplotlib.pyplot import figure
 from matplotlib import rc, rcdefaults
 from compute_nu import compute_nu
 from os import environ
@@ -19,7 +19,7 @@ if __name__ == '__main__':
     snap_id = '-1'
     z = (6.196857, 4.179475, 2.0700316, 1.5036374, 0.98870987, 0.5641763, 0) #Update the redshift
     ##Create figure and axes to create both the regular plot and the subpanel
-    fig = Figure()
+    fig = figure()
     st_ax = fig.add_axes([0.1, 0.1, 0.85, 0.85])
     sp_ax = fig.add_axes([0.17, 0.45, 0.40, 0.45])
     #Cosmology for MS and MS2
