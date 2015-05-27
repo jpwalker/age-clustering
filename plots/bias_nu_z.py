@@ -6,30 +6,34 @@ Created on Aug 22, 2013
 
 from numpy import logical_and, array, where
 from IO import readfile
-from matplotlib.pyplot import figure
+from matplotlib.pyplot import figure, show
 from matplotlib import rc, rcdefaults
 from compute_nu import compute_nu
 from os import environ
-from compute_nu_eff import calc_seljak_warren_w_cut
+from compute_nu_eff import calc_seljak_warren_w_cut, calc_mo_white_nu
 
 if __name__ == '__main__':
     h = 0.73
+    massconv = 6.885e6 #Mass conversion reports mass in M_sun/h
     snaps = (22, 27, 36, 40, 45, 51, 67)
     symbs = ('o', '^', 'v', 'D', 's', '*', 'p')
     snap_id = '-1'
-    z = (6.196857, 4.179475, 2.0700316, 1.5036374, 0.98870987, 0.5641763, 0) #Update the redshift
-    ##Create figure and axes to create both the regular plot and the subpanel
+    #Update the redshift as necessary
+    z = (6.196857, 4.179475, 2.0700316, 1.5036374, 0.98870987, 0.5641763, 0) 
+    ##Create figure and axes to create both the regular plot and the sub-panel
     fig = figure()
     st_ax = fig.add_axes([0.1, 0.1, 0.85, 0.85])
     sp_ax = fig.add_axes([0.17, 0.45, 0.40, 0.45])
     #Cosmology for MS and MS2
     cosmo = {'omega_M_0': 0.25, 'omega_lambda_0': 0.75, 'omega_b_0': 0.045, \
-             'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0} 
-    massconv = 6.885e6 #Mass conversion reports mass in M_sun/h
+             'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0}
     home = '{0}/'.format(environ['HOME'])
     (nu, b) = calc_seljak_warren_w_cut(1000, 0.65, cosmo)
     st_ax.plot(nu, b, 'k--')
     sp_ax.plot(nu, b, 'k--')
+    (nu, b) = calc_mo_white_nu(1000, cosmo)
+    st_ax.plot(nu, b, 'k-')
+    sp_ax.plot(nu, b, 'k-')
     age_bins = 5
     mass_bins = 7
     ifile = 'properties.dat'
@@ -69,4 +73,4 @@ if __name__ == '__main__':
     st_ax.set_ylabel('$b$')
     #st_ax.legend()
     rcdefaults()
-    fig.show()
+    show()
