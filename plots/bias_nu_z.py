@@ -10,7 +10,7 @@ from matplotlib.pyplot import figure, show
 from matplotlib import rc, rcdefaults
 from compute_nu import compute_nu
 from os import environ
-from compute_nu_eff import calc_seljak_warren_w_cut, calc_mo_white_nu
+from compute_nu_eff import calc_seljak_warren_w_cut, calc_mo_white_nu, calc_seljak_warren
 
 if __name__ == '__main__':
     h = 0.73
@@ -29,6 +29,9 @@ if __name__ == '__main__':
              'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0}
     home = '{0}/'.format(environ['HOME'])
     (nu, b) = calc_seljak_warren_w_cut(1000, 0.65, cosmo)
+    st_ax.plot(nu, b, 'r--')
+    sp_ax.plot(nu, b, 'r--')
+    (nu, b) = calc_seljak_warren(1000, cosmo)
     st_ax.plot(nu, b, 'k--')
     sp_ax.plot(nu, b, 'k--')
     (nu, b) = calc_mo_white_nu(1000, cosmo)
