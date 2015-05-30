@@ -19,7 +19,7 @@ if __name__ == '__main__':
     symbs = ('o', '^', 'v', 'D', 's', '*', 'p')
     snap_id = '-1'
     #Update the redshift as necessary
-    z = (6.196857, 4.179475, 2.0700316, 1.5036374, 0.98870987, 0.5641763, 0) 
+    z = (6.196857, 4.179475, 2.0700316, 1.5036374, 0.98870987, 0.5641763, 0.) 
     ##Create figure and axes to create both the regular plot and the sub-panel
     fig = figure()
     st_ax = fig.add_axes([0.1, 0.1, 0.85, 0.85])
@@ -60,7 +60,7 @@ if __name__ == '__main__':
             if symbs[i] == 'p' or symbs[i] == '*':
                 symsize = 5.
             else:
-                symsize = 4.  
+                symsize = 4.
             st_ax.plot(compute_nu(mass * massconv / h, z[i], cosmo), bias, symbs[i], 
                        color = col_j[age_i], 
                        label = '{0}, Q: {1}, z:{2}'.format(agelabel, age_i, z[i]), 
