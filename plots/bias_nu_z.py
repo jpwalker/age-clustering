@@ -28,13 +28,13 @@ if __name__ == '__main__':
     cosmo = {'omega_M_0': 0.25, 'omega_lambda_0': 0.75, 'omega_b_0': 0.045, \
              'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0}
     home = '{0}/'.format(environ['HOME'])
-    (nu, b) = calc_seljak_warren_w_cut(1000, 0.65, cosmo)
+    (nu, b, _) = calc_seljak_warren_w_cut(1000, 0.65, cosmo)
     st_ax.plot(nu, b, 'r--')
     sp_ax.plot(nu, b, 'r--')
-    (nu, b) = calc_seljak_warren(1000, cosmo)
+    (nu, b, _) = calc_seljak_warren(1000, cosmo)
     st_ax.plot(nu, b, 'k--')
     sp_ax.plot(nu, b, 'k--')
-    (nu, b) = calc_mo_white_nu(1000, cosmo)
+    (nu, b, _) = calc_mo_white_nu(1000, cosmo)
     st_ax.plot(nu, b, 'k-')
     sp_ax.plot(nu, b, 'k-')
     age_bins = 5
