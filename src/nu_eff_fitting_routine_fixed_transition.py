@@ -7,61 +7,24 @@ Fit nu_eff(nu) with a fixed transition in the break off.
 import matplotlib.pyplot as plt
 from matplotlib import rc
 from mpl_toolkits.mplot3d import Axes3D
-
 import numpy as np
 import os
 import compute_nu_eff as cmpn
 from scipy.optimize import leastsq
-from math import exp
 
-def fitting_func1((A, B, C), ls, rs, ages):
-    trans = 1000.
+##{f*x + g*(Exp[(x - B)] + B - 1
+def fitting_func1((A, B, C, D, E), ls, rs, ages):
     nu0 = A * np.exp(B * ages) + C
+    m = D  * ages + E
     #ls =nu and rs=nu_eff
     ret = []
     for i in range(len(ls)):
         x = ls[i] - nu0[i]
         y = rs[i] - nu0[i]
-        try:
-            e = exp(-trans * x)
-        except OverflowError:
-            e = 1E100
-            print('Overflow')
-        ret.append(y - x / (1. + e))
-    return ret
-
-def fitting_func2((m1, b1, m2, b2), ls, rs, B):
-    #ls =nu and rs=nu_eff
-    ret = np.zeros(len(ls), dtype = np.float64)
-    if (m2 - m1) != 0:
-        nu0 = (b1 - b2) / (m2 - m1)
-    else:
-        nu0 = 20.
-    x = ls - nu0
-    for i in range(len(ls)):
-        g = 1. / (1. + exp(-B * x[i]))
-        ret[i] = rs[i] - (m2 * ls[i] + b2 + ((m1 - m2) * ls[i] + b1 - b2) * g)
-    return ret
-
-def fitting_func3((A,), ls, rs, B1):
-    print A
-    #ls =nu and rs=nu_eff
-    ret = []
-    for i in range(len(ls)):
-        x = ls[i] - A
-        y = rs[i] - A
-        try:
-            e = exp(-B1 * x)
-        except OverflowError:
-            e = 1E100
-        ret.append(y - x / (1. + e))
-    return ret
-
-def param_fit_func((A, B, C), x, y):
-    print A, B, C
-    ret = np.zeros(len(x), dtype = np.float64)
-    for i in range(len(x)):
-        ret[i] = y[i] - (A * exp(B * x[i]) + C)
+        if ls[i] <= nu0[i]:
+            ret.append(y - m[i] * x)
+        else:
+            ret.append(rs[i] - ls[i])
     return ret
 
 def index_nu_eff(data, a_i, m_i):
@@ -74,13 +37,21 @@ def index_nu_eff(data, a_i, m_i):
     ret = idx2.intersection(idx)
     return np.array(list(ret))
 
-def surface_vals(y, x, (A, B, C)):
+def surface_vals(y, x, (A, B, C, D, E)):
     nu0 = A * np.exp(B * y) + C
-    x = x - nu0
-    trans = 1000.
-    return x / (1. + np.exp(-trans * x)) + nu0
- 
-def plot_best_fit(axis, (A, B, C)):
+    m = D  * y + E
+    x_n = x - nu0
+    z = np.zeros_like(x)
+    for (i, x_r_i) in enumerate(x):
+        for (j, x_i) in enumerate(x_r_i):
+            if x_i <= nu0[i][j]:
+                z[i][j] = m[i][j] * x_n[i][j] + nu0[i][j]
+            else:
+                z[i][j] = x_i  
+    return np.array(z)
+#f*x + g*(Exp[(x - B)] + B - 1 
+
+def plot_best_fit(axis, (A, B, C, D, E)):
     low_nu = 0.5
     nu_step = 0.05
     high_nu = 3 + nu_step
@@ -89,7 +60,7 @@ def plot_best_fit(axis, (A, B, C)):
     high_age = .5 + age_step
     mesh = np.meshgrid(np.arange(low_age, high_age, age_step), 
                        np.arange(low_nu, high_nu, nu_step))
-    z = surface_vals(mesh[0], mesh[1], (A, B, C))
+    z = surface_vals(mesh[0], mesh[1], (A, B, C, D, E))
     axis.plot_wireframe(mesh[0], mesh[1], z, alpha = .2)
     
 if __name__ == '__main__':
@@ -101,7 +72,7 @@ if __name__ == '__main__':
     snaps = (22, 27, 36, 40, 45, 51, 67)
     home = '{0}/'.format(os.environ['HOME'])
     snap_identifier = '-1'
-    (nu_no_age, bias_no_age, _)  = cmpn.calc_seljak_warren(1000, cosmo)
+    (nu_no_age, bias_no_age, _)  = cmpn.calc_seljak_warren_w_cut(1000, 0.65, cosmo)
     col_j = ('k', 'b', 'c', 'g', 'm', 'r') ##Predefined colors for age_i
     p1 = np.empty(len(snaps), dtype = np.object)
     #Properties for the mass-age sample across all redshifts
@@ -144,7 +115,9 @@ if __name__ == '__main__':
             fit_age = np.append(fit_age, tot_age)
             fit_nu = np.append(fit_nu, tot_nu)
             fit_nueff = np.append(fit_nueff, tot_nueff)
-    best_fits.append(leastsq(fitting_func1, (0.01, 10., 5.), args = (fit_nu, fit_nueff, fit_age)))
+    best_fits.append(leastsq(fitting_func1, 
+                             np.array([0.01, 10., 5., 1., 1.]), 
+                             args = (fit_nu, fit_nueff, fit_age), maxfev = 6000))
     bf = best_fits[-1]
     for ax in axi:
         plot_best_fit(ax, bf[0])
