@@ -12,19 +12,18 @@ import os
 import compute_nu_eff as cmpn
 from scipy.optimize import leastsq
 
-##{f*x + g*(Exp[(x - B)] + B - 1
-def fitting_func1((A, B, C, D, E), ls, rs, ages):
+def fitting_func1((A, B, C, D, E), nu, nu_e, ages):
     nu0 = A * np.exp(B * ages) + C
     m = D  * ages + E
     #ls =nu and rs=nu_eff
     ret = []
-    for i in range(len(ls)):
-        x = ls[i] - nu0[i]
-        y = rs[i] - nu0[i]
-        if ls[i] <= nu0[i]:
+    for i in range(len(nu)):
+        x = nu[i] - nu0[i]
+        y = nu_e[i] - nu0[i]
+        if nu[i] <= nu0[i]:
             ret.append(y - m[i] * x)
         else:
-            ret.append(rs[i] - ls[i])
+            ret.append(nu_e[i] - nu[i])
     return ret
 
 def index_nu_eff(data, a_i, m_i):
@@ -38,6 +37,7 @@ def index_nu_eff(data, a_i, m_i):
     return np.array(list(ret))
 
 def surface_vals(y, x, (A, B, C, D, E)):
+    # y is ages. x is nu
     nu0 = A * np.exp(B * y) + C
     m = D  * y + E
     x_n = x - nu0
@@ -64,7 +64,6 @@ def plot_best_fit(axis, (A, B, C, D, E)):
     axis.plot_wireframe(mesh[0], mesh[1], z, alpha = .2)
     
 if __name__ == '__main__':
-    #fixed_transition_model = 300.
     cosmo = {'omega_M_0': 0.25, 'omega_lambda_0': 0.75, 'omega_b_0': 0.045, \
              'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0} # INPUT
     zs = (6.196857, 4.179475, 2.0700316, 1.5036374, 0.98870987, 0.5641763, 0) #INPUT
@@ -117,7 +116,7 @@ if __name__ == '__main__':
             fit_nueff = np.append(fit_nueff, tot_nueff)
     best_fits.append(leastsq(fitting_func1, 
                              np.array([0.01, 10., 5., 1., 1.]), 
-                             args = (fit_nu, fit_nueff, fit_age), maxfev = 6000))
+                             args = (fit_nu, fit_nueff, fit_age)))
     bf = best_fits[-1]
     for ax in axi:
         plot_best_fit(ax, bf[0])

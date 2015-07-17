@@ -9,20 +9,19 @@ import matplotlib.pyplot as plt
 from matplotlib import rc
 from compute_nu_eff import calc_seljak_warren_w_cut
 from compute_nu_eff import reverse_calc_nu_eff
-from math import exp
 
 
 if __name__ == '__main__':
     cosmo = {'omega_M_0': 0.25, 'omega_lambda_0': 0.75, 'omega_b_0': 0.045, \
              'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0}
     seljak = calc_seljak_warren_w_cut(1000, 0.65, cosmo)
-    trans = 1000.
-    best_fit = (7.09088257E1, 3.21411038E-2, -7.03202061E1)
+    best_fit = (0.62564927,  0.57876966,  0.47245533, -5.23972499,  1.08041045)
     alpha = (0, -0.5, -0.25, 0.25, 0.5)
     color = ('blue', 'red', 'green', 'black')
-    nu0 = [best_fit[0] * exp(best_fit[1] * a) + best_fit[2] for a in alpha]
+    nu0 = [best_fit[0] * np.exp(best_fit[1] * a) + best_fit[2] for a in alpha]
+    m = [best_fit[3] * a + best_fit[4] for a in alpha]
     nu = np.linspace(0.5, 3.5, 1000)
-    nu_eff = [(nu - n0) / (1. + np.exp(-trans * (nu - n0))) + n0 for n0 in nu0]
+    nu_eff = [(nu-nu0[i]) * m[i] + nu0[i] for i in range(len(m))]
     bias = [reverse_calc_nu_eff(i, seljak) for i in nu_eff]
     for (i, y) in enumerate(bias):
         if i !=0:
