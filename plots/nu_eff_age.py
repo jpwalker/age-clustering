@@ -18,7 +18,7 @@ if __name__ == '__main__':
     snap_id = '-1'
     xtot = []
     ytot = []
-    (nu_no_age, bias_no_age, _)  = cmpn.calc_seljak_warren_w_cut(1000, 0.69, cosmo)
+    (nu_no_age, bias_no_age, _)  = cmpn.calc_seljak_warren_w_cut(1000, 0.75, cosmo)
     for (t, s) in enumerate(snaps):
         z = zs[t]
         finaldir = '{0}Desktop/age-clustering-data/snap{1}{2}/attempt1_sub_form_jp/'.format(home, s, snap_id) ##INPUT

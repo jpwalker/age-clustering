@@ -6,7 +6,7 @@ Created on Apr 20, 2014
 
 import numpy as np
 import os
-import compute_nu_eff as cmpn
+from compute_nu_eff import calc_seljak_warren_w_cut
 import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
@@ -17,7 +17,7 @@ if __name__ == '__main__':
     snaps = [22, 27, 36, 45, 67]
     xtot = []
     ytot = []
-    (nu_no_age, bias_no_age)  = cmpn.calc_seljak_warren(1000, cosmo)
+    (nu_no_age, bias_no_age)  = calc_seljak_warren_w_cut(1000, 0.75, cosmo)
     for (t, s) in enumerate(snaps):
         z = zs[t]
         finaldir = '{0}Desktop/age-clustering-data/snap{1}/attempt1_sub_form_gao/'.format(home, s) ##INPUT

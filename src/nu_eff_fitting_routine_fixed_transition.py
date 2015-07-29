@@ -71,7 +71,7 @@ if __name__ == '__main__':
     snaps = (22, 27, 36, 40, 45, 51, 67)
     home = '{0}/'.format(os.environ['HOME'])
     snap_identifier = '-1'
-    (nu_no_age, bias_no_age, _)  = cmpn.calc_seljak_warren_w_cut(1000, 0.69, cosmo)
+    (nu_no_age, bias_no_age, _)  = cmpn.calc_seljak_warren_w_cut(1000, 0.75, cosmo)
     col_j = ('k', 'b', 'c', 'g', 'm', 'r') ##Predefined colors for age_i
     p1 = np.empty(len(snaps), dtype = np.object)
     #Properties for the mass-age sample across all redshifts
