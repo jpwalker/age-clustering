@@ -4,7 +4,9 @@ Creates a table for latex where the properties of the age-mass selected samples 
 @author: jpwalker
 '''
 
-from IO import *
+from os.path import join
+from os import environ
+from IO import readfile
 import numpy as np
 
 def write_tex(fn, bn, d1, d2):
@@ -30,13 +32,35 @@ def write_tex(fn, bn, d1, d2):
     f.write("""\\end{deluxetable}""")
     f.close()
     
-    
-    
+
 if __name__ == "__main__":
-    direc = '/home/jpwalker/Desktop/z0_attempt1_form/'
-    files = ['properties.dat', 'bias_properties.dat']
-    out = 'prop_table_attempt1_form.tex'
-    data1 = readfile('{0}{1}'.format(direc, files[0]), col = 12, delim = '    ', skip = 1)
-    data2 = readfile('{0}{1}'.format(direc, files[1]), col = 3, delim=' ', skip = 1)
-    write_tex('{0}{1}'.format(direc, out), 'HMFA1-', data1, data2)
+    home = environ['HOME']
+    b_t_direc = join(home, 'Desktop/age-clustering-data')
+    o_direc = join(home, 'Google\\ Drive/Age-Clustering\\ Paper')
+    tables = ('attempt1_fof_form_jp', 'attempt1_fof_form_gao', 
+              'attempt1_fof_assem_jp', 'attempt1_fof_assem_gao', 
+              'attempt1_sub_form_jp', 'attempt1_sub_form_gao', 
+              'attempt1_sub_assem_jp', 'attempt1_sub_assem_gao')
+    table_labels = ('M-Form-FOF', 'R-Form-FOF', 'M-Assem-FOF', 'R-Assem-FOF',
+                    'M-Form-sub', 'R-Form-sub', 'M-Assem-sub', 'R-Assem-sub')
+    outs = ('prop_table_fof_form_jp.tex', 'prop_table_fof_form_gao.tex', 
+            'prop_table_fof_assem_jp.tex', 'prop_table_fof_assem_gao.tex', 
+            'prop_table_sub_form_jp.tex', 'prop_table_sub_form_gao.tex', 
+            'prop_table_sub_assem_jp.tex', 'prop_table_sub_assem_gao.tex')
+    snaps = (22,27,31,36,40,45,51,67)
+    zs = (6.196857, 4.179475,3.060424,2.0700316,1.5036374, 0.5641763, 0.)
+    snap_postfix = '-1'
+    files = ('properties.dat',) 
+    for t in tables:
+        for sn in snaps:
+            t_direc = join(b_t_direc, 'snap{0}{1}'.format(sn, snap_postfix), t)
+            for f in files:
+                fn = join(t_direc, f)
+                try:
+                    data = readfile(fn, col = 28, delim = '    ', skip = 1)
+                except IOError:
+                    print('Unable to open: {0}'.format(fn))
+                except TypeError:
+                    print(fn)
+            #write_tex('{0}{1}'.format(direc, out), 'HMFA1-', data1, data2)
     
