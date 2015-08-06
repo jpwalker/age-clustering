@@ -11,11 +11,7 @@ import numpy as np
 
 def write_tex(fn, bn, d1, d2):
     f = open(fn, 'w')
-    f.write("""\\begin{deluxetable}{lcccccccc}\n""")
-    f.write("""    \\tablehead{\colhead{Name} & \colhead{Bias} & \colhead{Number} & \colhead{Min. Mass} & \colhead{Median Mass} & \colhead{Max. Mass} & \colhead{Min. Age} & \colhead{Median Age} & \colhead{Max. Age}}\n""")
-    f.write("""    \\tabletypesize{\\tiny}\n""")
-    f.write("""    \\tablewidth{0pt}\n""")
-    f.write("""    \\startdata\n""")
+    
     for i in range(len(d1[0])):
         idx = np.where(np.logical_and(d2[0] == d1[0][i], d2[1] == d1[1][i]))
         if len(d2[0][idx]) == 1:
@@ -32,11 +28,18 @@ def write_tex(fn, bn, d1, d2):
     f.write("""\\end{deluxetable}""")
     f.close()
     
+def setup_file(fn):
+    f = open(fn, 'w')
+    f.write("""\\begin{deluxetable}{lcccccccc}\n""")
+    f.write("""    \\tablehead{\colhead{Name} & \colhead{Bias} & \colhead{Number} & \colhead{Min. Mass} & \colhead{Median Mass} & \colhead{Max. Mass} & \colhead{Min. Age} & \colhead{Median Age} & \colhead{Max. Age}}\n""")
+    f.write("""    \\tabletypesize{\\tiny}\n""")
+    f.write("""    \\tablewidth{0pt}\n""")
+    f.write("""    \\startdata\n""")
 
 if __name__ == "__main__":
     home = environ['HOME']
     b_t_direc = join(home, 'Desktop/age-clustering-data')
-    o_direc = join(home, 'Google\\ Drive/Age-Clustering\\ Paper')
+    b_o_direc = join(home, 'Google\\ Drive/Age-Clustering\\ Paper')
     tables = ('attempt1_fof_form_jp', 'attempt1_fof_form_gao', 
               'attempt1_fof_assem_jp', 'attempt1_fof_assem_gao', 
               'attempt1_sub_form_jp', 'attempt1_sub_form_gao', 
@@ -50,8 +53,10 @@ if __name__ == "__main__":
     snaps = (22,27,31,36,40,45,51,67)
     zs = (6.196857, 4.179475,3.060424,2.0700316,1.5036374, 0.5641763, 0.)
     snap_postfix = '-1'
-    files = ('properties.dat',) 
-    for t in tables:
+    files = ('properties.dat',)
+    for (t, l, o) in zip(tables, table_labels, outs):
+        o_direc = join(b_o_direc, o)
+        setup_file(o_direc)
         for sn in snaps:
             t_direc = join(b_t_direc, 'snap{0}{1}'.format(sn, snap_postfix), t)
             for f in files:
@@ -60,7 +65,5 @@ if __name__ == "__main__":
                     data = readfile(fn, col = 28, delim = '    ', skip = 1)
                 except IOError:
                     print('Unable to open: {0}'.format(fn))
-                except TypeError:
-                    print(fn)
-            #write_tex('{0}{1}'.format(direc, out), 'HMFA1-', data1, data2)
+                write_tex(odirec, 'HMFA1-', data1, data2)
     
