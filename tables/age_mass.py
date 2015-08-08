@@ -15,10 +15,14 @@ from compute_nu_eff import calc_bias
 from numpy import logical_and
 
 prefix = """\\begin{deluxetable}{lccccccccc}
+    \\tablecaption{}
     \\tablehead{\colhead{Name} & \\colhead{Number} & 
     \\colhead{Mass Range} & \\colhead{Median Mass} & \\colhead{Age Range} & 
     \\colhead{Median Age} & \\colhead{$z$} & \\colhead{$\\alpha$} &  
-    \\colhead{$\\nu$} & \\colhead{$b$}}
+    \\colhead{$\\nu$} & \\colhead{$b$} \\\\ & & 
+    \\colhead{$\\log_{10}\\mathrm{M}/\\mathrm{M}_\\odot$} & 
+    \\colhead{$\\log_{10}\\mathrm{M}/\\mathrm{M}_\\odot$} & 
+    \\colhead{Gyr} & \\colhead{Gyr} & & & &}
     \\tabletypesize{\\tiny}
     \\tablewidth{0pt}
     \\startdata
@@ -36,12 +40,9 @@ def write_tex(f, label, data, end=False):
     b_tex_line = '\t\t{0}{1}'.format(label, '-{0:}-{1:} & {2:,} & \
 [{3:4.3},{4:4.3}] & {5:4.3} & [{6:4.3},{7:4.3}] & {8:4.3} & {9:4.3} & {10:4.3} & \
 {11:4.3} & {12:4.3}{13}')
+    cap = '\\\\\n'
     for i in range(len(data[0])):
         if data[0][i] != 0:
-            if end and i == (len(data[0]) - 1):
-                cap = ''
-            else:
-                cap = '\\\\\n'
             mass_i = int(data[0][i])
             age_i = int(data[1][i])
             masses = (log10(data[3][i] * mass_conv), 
@@ -78,6 +79,10 @@ if __name__ == "__main__":
               'attempt1_sub_assem_jp', 'attempt1_sub_assem_gao')
     table_labels = ('M-Form-FOF', 'R-Form-FOF', 'M-Assem-FOF', 'R-Assem-FOF',
                     'M-Form-sub', 'R-Form-sub', 'M-Assem-sub', 'R-Assem-sub')
+    titles = ('Max-Formation-FOF Age', 'Root-Formation-FOF Age', 
+              'Max-Assembly-FOF Age', 'Root-Assembly-FOF Age', 
+              'Max-Formation-subhalo Age', 'Root-Formation-subhalo Age', 
+              'Max-Assembly-subhalo Age', 'Root-Assembly-subhalo Age')
     outs = ('prop_table_fof_form_jp.tex', 'prop_table_fof_form_gao.tex', 
             'prop_table_fof_assem_jp.tex', 'prop_table_fof_assem_gao.tex', 
             'prop_table_sub_form_jp.tex', 'prop_table_sub_form_gao.tex', 
@@ -87,7 +92,7 @@ if __name__ == "__main__":
           0.5641763, 0.)
     snap_postfix = '-1'
     files = 'properties.dat'
-    for (t, l, o) in zip(tables, table_labels, outs):
+    for (t, l, o, tt) in zip(tables, table_labels, outs, titles):
         o_direc = join(b_o_direc, o)
         of = setup_file(o_direc)
         for (sn, z) in zip(snaps, zs):
