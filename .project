@@ -5,7 +5,7 @@
 	<projects>
 		<project>compute_sigma_R</project>
 		<project>MillenniumII</project>
-		<project>simple_ascii_IO</project>
+		<project>simple_IO</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

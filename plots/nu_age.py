@@ -6,22 +6,24 @@ Created on Apr 20, 2014
 
 import numpy as np
 import os
-from compute_nu_eff import calc_seljak_warren_w_cut
+from compute_nu_eff import calc_seljak_warren_w_cut, nu_eff
 import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     cosmo = {'omega_M_0': 0.25, 'omega_lambda_0': 0.75, 'omega_b_0': 0.045, \
              'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0} # INPUT
-    zs =  [6.196857, 4.179475, 2.0700316, 0.98870987, 0] #INPUT
+    zs =  [6.196857, 4.179475, 3.0604243, 2.0700316, 1.5036374, 0.98870987, 
+           0.564176, 0] #INPUT
     home = '{0}/'.format(os.environ['HOME'])
-    snaps = [22, 27, 36, 45, 67]
+    snaps = [22, 27, 31, 36, 40, 45, 51, 67]
+    suffix = '-1'
     xtot = []
     ytot = []
-    (nu_no_age, bias_no_age)  = calc_seljak_warren_w_cut(1000, 0.75, cosmo)
+    (nu_no_age, bias_no_age, _)  = calc_seljak_warren_w_cut(1000, 0.75, cosmo)
     for (t, s) in enumerate(snaps):
         z = zs[t]
-        finaldir = '{0}Desktop/age-clustering-data/snap{1}/attempt1_sub_form_gao/'.format(home, s) ##INPUT
-        agelabel = 'Sub-Root-Form. Age' ##INPUT
+        finaldir = '{0}Desktop/age-clustering-data/snap{1}{2}/attempt1_sub_form_jp/'.format(home, s, suffix) ##INPUT
+        agelabel = 'Sub-Max-Form. Age' ##INPUT
         col_j = ['k', 'b', 'c', 'g', 'm', 'r'] ##Predefined colors for age_i
         
         nu_res = []
@@ -30,11 +32,11 @@ if __name__ == '__main__':
             y = np.array([])
             txt = np.array([],dtype = int)
             if age_i == 0:
-                temp = cmpn.nu_eff(finaldir, age_i, range(1, 7), cosmo, z, nu_no_age, bias_no_age)
+                temp = nu_eff(finaldir, (age_i,), range(1, 9), cosmo, z, nu_no_age, bias_no_age)
                 median_age = temp[5]
                 mass_i_median_age = temp[0]
             else:
-                nu_res.append(cmpn.nu_eff(finaldir, age_i, range(1, 7), cosmo, z, nu_no_age, bias_no_age))
+                nu_res.append(nu_eff(finaldir, (age_i,), range(1, 9), cosmo, z, nu_no_age, bias_no_age))
                 for (idx, x_temp) in enumerate(nu_res[-1][5]):
                     idx2 = np.where(mass_i_median_age == nu_res[-1][0][idx])[0]
                     x = np.append(x, (x_temp - median_age[idx2]) / median_age[idx2]) 
