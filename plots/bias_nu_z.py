@@ -10,7 +10,8 @@ from matplotlib.pyplot import figure, show
 from matplotlib import rc, rcdefaults
 from compute_nu import compute_nu
 from os import environ
-from compute_nu_eff import calc_seljak_warren_w_cut, calc_mo_white_nu, calc_seljak_warren
+from compute_nu_eff import calc_seljak_warren_w_cut, calc_mo_white_nu, calc_seljak_warren,\
+    calc_sheth_tormen_nu
 
 if __name__ == '__main__':
     h = 0.73
@@ -37,6 +38,9 @@ if __name__ == '__main__':
     (nu, b, _) = calc_mo_white_nu(1000, cosmo)
     st_ax.plot(nu, b, 'k-')
     sp_ax.plot(nu, b, 'k-')
+    (nu, b, _) = calc_sheth_tormen_nu(1000, cosmo)
+    st_ax.plot(nu, b, 'g-')
+    sp_ax.plot(nu, b, 'g-')
     age_bins = 5
     mass_bins = 7
     ifile = 'properties.dat'
