@@ -15,8 +15,8 @@ if __name__ == '__main__':
              'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0}
     seljak = calc_seljak_warren_w_cut(1000, 0.75, cosmo)
     nu = linspace(0.3, 3.5, 1000)
-    best_fit = (0.11190771,  4.21446985,  0.92813456, -2.90085566,  0.77097921)
-    alpha = (0, -0.15, -0.1, 0.1, 0.15)
+    best_fit = (0.11189464,  4.21471345,  0.92813833, -2.90082599,  0.77097244)
+    alpha = (0, -0.15, -0.1, 0.1, 0.5)
     color = ('black', 'blue', 'cyan', 'magenta', 'red')
     nu0 = [best_fit[0] * exp(best_fit[1] * a) + best_fit[2] for a in alpha]
     m = [best_fit[3] * a + best_fit[4] for a in alpha]
