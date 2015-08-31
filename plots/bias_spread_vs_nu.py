@@ -5,7 +5,7 @@ Created on Mar 4, 2015
 '''
 
 from numpy import concatenate, exp, linspace
-from matplotlib.pyplot import plot, xlabel, ylabel, show, legend
+from matplotlib.pyplot import plot, xlabel, ylabel, show, legend, xlim
 from matplotlib import rc
 from compute_nu_eff import calc_seljak_warren_w_cut
 from compute_nu_eff import reverse_calc_nu_eff
@@ -18,11 +18,11 @@ if __name__ == '__main__':
              'h': 0.73, 'sigma_8': 0.9, 'n': 1.0, 'omega_n_0': 0., 'N_nu': 0}
     seljak = calc_seljak_warren_w_cut(1000, 0.75, cosmo)
     best_fit = (0.11189464,  4.21471345,  0.92813833, -2.90082599,  0.77097244)
-    alpha = (0, -0.15, -0.1, 0.1, 0.5)
+    alpha = (0, -0.15, -0.1, 0.1, 0.4)
     color = ('black', 'blue', 'cyan', 'magenta', 'red')
     nu0 = [best_fit[0] * exp(best_fit[1] * a) + best_fit[2] for a in alpha]
     m = [best_fit[3] * a + best_fit[4] for a in alpha]
-    nu = linspace(0.3, 3.5, 1000)
+    nu = linspace(0.4, 3.5, 1000)
     nu_eff = [calc_nu_eff(nu, m[i], nu0[i]) for i in range(len(m))]
     bias_nueff = [reverse_calc_nu_eff(i, seljak) for i in nu_eff]
     bias_nu = reverse_calc_nu_eff(nu, seljak)
@@ -33,4 +33,5 @@ if __name__ == '__main__':
     xlabel('$\\nu$')
     ylabel('$b_{\\nu_{\\mathrm{eff}}}-b_\\nu$')
     legend()
+    xlim([0.4,3.5])
     show()
