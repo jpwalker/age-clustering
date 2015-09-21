@@ -8,6 +8,7 @@ import numpy as np
 import os
 from compute_nu_eff import calc_seljak_warren_w_cut, nu_eff
 import matplotlib.pyplot as plt
+from matplotlib import rc
 
 if __name__ == '__main__':
     cosmo = {'omega_M_0': 0.25, 'omega_lambda_0': 0.75, 'omega_b_0': 0.045, \
@@ -46,14 +47,15 @@ if __name__ == '__main__':
                 ytot.extend(y)
                 plt.plot(x, y, '+', 
                          color = col_j[age_i], label = '{0}_{1}_{2}'.format(agelabel, s, age_i))
-                for (i, txt_i) in enumerate(txt):
-                    plt.text(x[i], y[i], txt_i)
+#                 for (i, txt_i) in enumerate(txt):
+#                     plt.text(x[i], y[i], txt_i)
     #xtot = np.array(xtot)
     #ytot = np.array(ytot)
     #(slope, intercept, rval, pval, stderr) = linregress(xtot, ytot)
     #plt.plot(xtot, xtot * slope + intercept , 'r')
     #plt.plot([0, 0], [10, 0], '--k')
-    plt.xlabel('(age - <age>) / <age>')
-    plt.ylabel('nu')
+    rc('text', usetex = True)
+    plt.xlabel('$\\alpha$')
+    plt.ylabel('$\\nu$')
     #plt.legend()
     plt.show()
