@@ -7,6 +7,7 @@
 <path>/age-clustering/src</path>
 <path>/age-clustering/tables</path>
 <path>/age-clustering/Boylan-Kolchin_corr_test</path>
+<path>/${PROJECT_DIR_NAME}/Bootstrap</path>
 </pydev_pathproperty>
 
 
