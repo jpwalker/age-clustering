@@ -55,7 +55,7 @@ if __name__ == '__main__':
             mass = []
             for mass_i in range(1, mass_bins + 1):
                 b_data = readfile('{0}bias/bias_{1}_{2}'.format(direc, mass_i, age_i), col = 2, delim = ',', skip = 1)
-                idx1 = where(logical_and(b_data[0] >= 5 / h, b_data[0] <= 15 / h))[0]
+                idx1 = where(logical_and(b_data[0] >= 5 * h, b_data[0] <= 15 * h))[0]
                 idx2 = where(logical_and(data[0] == mass_i, data[1] == age_i))[0]
                 bias.append(sum(b_data[1][idx1]) / len(b_data[1][idx1]))
                 mass.append(data[4][idx2][0])
