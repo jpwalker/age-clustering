@@ -23,5 +23,5 @@ if __name__ == '__main__':
     d_halo = join('halo_tables', 'halo_table_{0}_{1}.dat'.format(i, j))
     fn = join(hm, 'Desktop', 'age-clustering-data', d_snap, d_age, d_halo)
     print(fn)
-    main_sample = read_halo_table_ascii(fn, fmt)
+    main_sample = read_halo_table_ascii(fn, fmt, skip = 1)
     print(main_sample['length'])
