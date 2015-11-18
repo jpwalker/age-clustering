@@ -9,6 +9,7 @@ from os import environ, times, getpid
 from os.path import join
 from random import choice, randint, seed
 from itertools import ifilter
+from threading import RLock, Thread
 
 def params(num_halos):
     # Determine number of halos in each subsample used in future bootstrap 
@@ -55,10 +56,9 @@ def set_idx2 (params):
         idx.append([i for i in ifilter(lmb, range(params['nh']))])
         smp += 1
     return tuple(idx)
-    
+
     
 if __name__ == '__main__':
-    
     fmt = 'x,x,x,x,x,x,x,7,8,9,x,x,x,x,x,x,x,17,x,x,x'
     fn = init_direc()
     main_sample = read_halo_table_ascii(fn, fmt, skip = 1)
@@ -67,4 +67,3 @@ if __name__ == '__main__':
     from matplotlib.pyplot import hist, show
     hist(idx, bins = params['ns'])
     show()
-    idx = []
