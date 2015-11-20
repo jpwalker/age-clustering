@@ -51,9 +51,10 @@ def set_idx1(params):
 def set_idx2 (params):
     smp = 1
     idx = []
-    while smp <= params['ns']:
+    
+    for smp in range(params['ns']):
         lmb = lambda x: x % params['ns'] + 1 == smp
-        idx.append([i for i in ifilter(lmb, range(params['nh']))])
+        idx.append()
         smp += 1
     return tuple(idx)
 
@@ -63,7 +64,7 @@ if __name__ == '__main__':
     fn = init_direc()
     main_sample = read_halo_table_ascii(fn, fmt, skip = 1)
     params = params(main_sample['length'])
-    idx = set_idx2(params)
+    idx = set_idx1(params)
     from matplotlib.pyplot import hist, show
     hist(idx, bins = params['ns'])
     show()
