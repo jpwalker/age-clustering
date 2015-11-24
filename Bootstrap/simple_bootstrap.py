@@ -4,27 +4,30 @@ Created on Nov 12, 2015
 @author: jpwalker
 '''
 
-from MillenniumII import read_halo_table_ascii
+from MillenniumII import read_halo_table_ascii, select_halo_table,\
+    create_halo_table, halo_table_extend
 from os import environ, times, getpid
 from os.path import join
-from random import choice, randint, seed
-from itertools import ifilter
-from threading import RLock, Thread
+from random import randint, seed, sample, choice
 
-def params(num_halos):
+def create_params(num_halos):
     # Determine number of halos in each subsample used in future bootstrap 
     # samples.
     if num_halos >= 800:
-        ns = num_halos // 100
+        if num_halos % 100 != 0:
+            ns = (num_halos // 100) + 1 # Number of samples
+        else:
+            ns = num_halos // 100 # Number of samples
+        nhs = 100 # Number of halos in samples
     else:
-        ns = 8
-    # Number of bootstrap samples created.
-    n_resmp = 100
+        ns = 8 # Number of samples
+        nhs = num_halos // 8 # Number of halos in samples
+    n_resmp = 100 # Number of bootstrap resamples created.
     # Determine the seed for the RNG.
     t = times()
     sd = hash(hash(t[0]) + hash(t[4]) + hash(getpid()))
     seed(sd)
-    return {'ns':ns, 'seed':seed, 'nr':n_resmp, 'nh':num_halos}
+    return {'ns':ns, 'seed':seed, 'nr':n_resmp, 'nh':num_halos, 'nhs':nhs}
 
 def init_direc():
     hm = environ['HOME']
@@ -49,22 +52,50 @@ def set_idx1(params):
     return tuple(idx)
 
 def set_idx2 (params):
-    smp = 1
+    nh = params['nh']
+    av_idx = range(nh)
     idx = []
-    
-    for smp in range(params['ns']):
-        lmb = lambda x: x % params['ns'] + 1 == smp
-        idx.append()
-        smp += 1
+    nhs = params['nhs']
+    for _ in range(params['ns']):
+        if nh >= nhs:
+            temp = sample(av_idx, nhs)
+            for i in temp:
+                temp_idx = av_idx.index(i)
+                _ = av_idx.pop(temp_idx)
+            idx.append(temp)
+        else:
+            idx.append(av_idx)
+        nh = len(av_idx)
     return tuple(idx)
 
     
+def create_samples(halos, idxs):
+    samples = []
+    for idx in idxs:
+        samples.append(select_halo_table(halos, idx))
+    return samples
+
+def create_bootstraps(params, samples):
+    nbs = params['ns'] * 3 # Number of samples contained in each bootstrap
+                            # resample is 3 times the original sample.
+    BS_samples = []
+    for _ in xrange(params['nr']):
+        BS_samples.append(create_halo_table())
+        for _ in xrange(nbs):
+            halo_table_extend(BS_samples[-1], choice(samples))
+    return BS_samples
+
 if __name__ == '__main__':
     fmt = 'x,x,x,x,x,x,x,7,8,9,x,x,x,x,x,x,x,17,x,x,x'
     fn = init_direc()
     main_sample = read_halo_table_ascii(fn, fmt, skip = 1)
-    params = params(main_sample['length'])
-    idx = set_idx1(params)
-    from matplotlib.pyplot import hist, show
-    hist(idx, bins = params['ns'])
-    show()
+    params = create_params(main_sample['length'])
+    idxs = set_idx2(params)
+    draw_samples = create_samples(main_sample, idxs)
+    BS_samples = create_bootstraps(params, draw_samples)
+    print(len(BS_samples))
+    for i in BS_samples:
+        print(i['length'])
+#     from matplotlib.pyplot import hist, show
+#     hist(idx, bins = params['ns'])
+#     show()

@@ -68,7 +68,7 @@ if __name__ == '__main__':
             else:
                 symsize = 4.
             n = compute_nu(mass * massconv / h, z[i], cosmo)
-            if age_i == 0:
+            if age_i == 3:
                 overall_data[0].extend(n)
                 overall_data[1].extend(bias)
             st_ax.plot(n, bias, symbs[i], 
