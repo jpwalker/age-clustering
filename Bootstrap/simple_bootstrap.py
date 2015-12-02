@@ -9,6 +9,7 @@ from MillenniumII import read_halo_table_ascii, select_halo_table,\
 from os import environ, times, getpid
 from os.path import join
 from random import randint, seed, sample, choice
+from threading import Thread, RLock
 
 def create_params(num_halos):
     # Determine number of halos in each subsample used in future bootstrap 
@@ -51,7 +52,7 @@ def set_idx1(params):
         idx.append(range(params['nh'])[temp == i])
     return tuple(idx)
 
-def set_idx2 (params):
+def set_idx2(params):
     nh = params['nh']
     av_idx = range(nh)
     idx = []
@@ -85,6 +86,23 @@ def create_bootstraps(params, samples):
             halo_table_extend(BS_samples[-1], choice(samples))
     return BS_samples
 
+def thread_func(samples):
+    for smp in samples:
+        
+
+def setup_threads(params, samples, num=8):
+    ns = params['ns']
+    thrds = []
+    sample_start = 0
+    sample_end = ns // num + 1
+    for i in range(num):
+        arg = (samples[sample_start:sample_end])
+        thrds.append(Thread(target=thread_func, args=arg))
+        sample_start = sample_end + 1
+        sample_end += ns // num + 1
+        if sample_end > ns - 1:
+            sample_end = ns - 1
+        
 if __name__ == '__main__':
     fmt = 'x,x,x,x,x,x,x,7,8,9,x,x,x,x,x,x,x,17,x,x,x'
     fn = init_direc()
@@ -93,9 +111,8 @@ if __name__ == '__main__':
     idxs = set_idx2(params)
     draw_samples = create_samples(main_sample, idxs)
     BS_samples = create_bootstraps(params, draw_samples)
-    print(len(BS_samples))
+    setup_threads()
     for i in BS_samples:
-        print(i['length'])
 #     from matplotlib.pyplot import hist, show
 #     hist(idx, bins = params['ns'])
 #     show()
