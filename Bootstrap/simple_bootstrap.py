@@ -9,7 +9,8 @@ from MillenniumII import read_halo_table_ascii, select_halo_table,\
 from os import environ, times, getpid
 from os.path import join
 from random import randint, seed, sample, choice
-from threading import Thread, RLock
+from Correlation_Func import calc_bias_cross
+from threading import Thread
 
 def create_params(num_halos):
     # Determine number of halos in each subsample used in future bootstrap 
@@ -86,10 +87,11 @@ def create_bootstraps(params, samples):
             halo_table_extend(BS_samples[-1], choice(samples))
     return BS_samples
 
-def thread_func(samples):
+#a_halos represents all halos used in the cross-correlation.
+def thread_func(samples, a_halos, xi_m_m, xi_all):
     for smp in samples:
-        calc_bias_cross(halo_table1, halo_table2, xi_m_m, halo_file1 = '', \
-                    halo_file2 = '', cross_filename = '', auto_filename = '', 
+        
+        _ = calc_bias_cross(smp, a_halos, xi_m_m, halo_file1 =  cross_filename = '', auto_filename = '', 
                     bias_filename = '', xi_auto_halos = None, MS2 = False)
 
 def setup_threads(params, samples, num=8):
@@ -97,8 +99,8 @@ def setup_threads(params, samples, num=8):
     thrds = []
     sample_start = 0
     sample_end = ns // num + 1
-    for i in range(num):
-        arg = (samples[sample_start:sample_end])
+    for _ in xrange(num):
+        arg = (samples[sample_start:sample_end], )
         thrds.append(Thread(target=thread_func, args=arg))
         sample_start = sample_end + 1
         sample_end += ns // num + 1
