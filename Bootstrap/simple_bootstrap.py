@@ -88,7 +88,9 @@ def create_bootstraps(params, samples):
 
 def thread_func(samples):
     for smp in samples:
-        
+        calc_bias_cross(halo_table1, halo_table2, xi_m_m, halo_file1 = '', \
+                    halo_file2 = '', cross_filename = '', auto_filename = '', 
+                    bias_filename = '', xi_auto_halos = None, MS2 = False)
 
 def setup_threads(params, samples, num=8):
     ns = params['ns']
