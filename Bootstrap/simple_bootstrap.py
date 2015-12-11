@@ -111,13 +111,18 @@ def create_bootstraps(params, samples):
             halo_table_extend(BS_samples[-1], choice(samples))
     return BS_samples
 
-def thread_func(samples, smp_idx_start, a_halos, xi_m_m, xi_all):
-    #a_halos represents all halos used in the cross-correlation.
+def thread_func(samples, smp_idx_start, a_halos, xi_m_m, xi_all, of):
+    #smp_idx_start is the starting indesx number used to uniquely save data.
+    #a_halos is a halo table with all halos used in the cross-correlation.
     #xi_all, xi_m_m holds the autocorrelation function of all halos and matter.
-    for smp in samples:
-        
-        _ = calc_bias_cross(smp, a_halos, xi_m_m, halo_file1 = '', cross_filename = '', auto_filename = '', 
-                    bias_filename = '', xi_auto_halos = None, MS2 = False)
+    for (t_idx, smp) in enumerate(samples):
+        idx = t_idx + smp_idx_start
+        hf = of['ht'].format(idx)
+        crsf = of['xi'].format(idx)
+        bf = of['b'].format(idx)
+        _ = calc_bias_cross(smp, a_halos, xi_m_m, halo_file1 = hf, 
+                            cross_filename = crsf, bias_filename = bf, 
+                            xi_auto_halos = xi_all, MS2 = True)
 
 def setup_threads(params, fn_i, fn_o, samples, num=8):
     ns = params['ns']
@@ -130,7 +135,7 @@ def setup_threads(params, fn_i, fn_o, samples, num=8):
     xi_all = read_corr_file(fn_i['xa'])
     for _ in xrange(num):
         arg = (samples[sample_start:sample_end], sample_start, all_ht, 
-               xi_m_m, xi_all)
+               xi_m_m, xi_all, fn_o)
         thrds.append(Thread(target=thread_func, args=arg))
         sample_start = sample_end + 1
         sample_end += ns // num + 1
