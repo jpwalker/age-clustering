@@ -10,7 +10,7 @@ from os import environ, times, getpid, makedirs
 from os.path import join, exists
 from random import randint, seed, sample, choice
 from Correlation_Func import calc_bias_cross, read_corr_file
-from threading import Thread
+from threading import Thread, Semaphore
 
 def create_params(num_halos):
     # Determine number of halos in each subsample used in future bootstrap 
@@ -126,6 +126,7 @@ def thread_func(samples, smp_idx_start, a_halos, xi_m_m, xi_all, of):
 
 def setup_threads(params, fn_i, fn_o, samples, num=8):
     ns = params['ns']
+    Semaphore()
     thrds = []
     sample_start = 0
     sample_end = ns // num + 1
@@ -142,6 +143,7 @@ def setup_threads(params, fn_i, fn_o, samples, num=8):
         if sample_end > ns - 1:
             sample_end = ns - 1
         
+        
 if __name__ == '__main__':
     fmt = 'x,x,x,x,x,x,x,7,8,9,x,x,x,x,x,x,x,17,x,x,x'
     (fn_i, fn_o) = init_direc()
@@ -150,7 +152,8 @@ if __name__ == '__main__':
     idxs = set_idx2(params)
     draw_samples = create_samples(main_sample, idxs)
     BS_samples = create_bootstraps(params, draw_samples)
-    setup_threads(params, fn_i, fn_o, BS_samples)
+    setup_threads(params, fn_i, fn_o, BS_samples, num=1)
+    
     #for i in BS_samples:
 #     from matplotlib.pyplot import hist, show
 #     hist(idx, bins = params['ns'])
