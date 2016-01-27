@@ -11,6 +11,7 @@ from os.path import join, exists
 from random import randint, seed, sample, choice
 from Correlation_Func import calc_bias_cross, read_corr_file
 from threading import Thread
+from cProfile import run
 
 def create_params(num_halos):
     # Determine number of halos in each subsample used in future bootstrap 
@@ -116,6 +117,7 @@ def thread_func(samples, smp_idx_start, a_halos, xi_m_m, xi_all, of):
     #a_halos is a halo table with all halos used in the cross-correlation.
     #xi_all, xi_m_m holds the autocorrelation function of all halos and matter.
     #of is the output file.
+    print(smp_idx_start)
     for (t_idx, smp) in enumerate(samples):
         idx = t_idx + smp_idx_start
         hf = of['ht'].format(idx)
@@ -125,13 +127,13 @@ def thread_func(samples, smp_idx_start, a_halos, xi_m_m, xi_all, of):
                             cross_filename = crsf, bias_filename = bf, 
                             xi_auto_halos = xi_all, MS2 = True)
 
-def setup_threads(params, fn_i, fn_o, samples, num=8):
+def setup_threads(params, fn_i, fn_o, samples, num=1):
     ns = params['ns']
     thrds = []
     sample_start = 0
     sample_end = ns // num + 1
     fmt = 'x,x,x,x,x,x,x,7,8,9,x,x,x,x,x,x,x,17,x,x,x'
-    all_ht = read_halo_table_ascii(fn_i['xa'], fmt, skip = 1)
+    all_ht = read_halo_table_ascii(fn_i['a_ht'], fmt, skip = 1)
     xi_m_m = read_corr_file(fn_i['xm'])
     xi_all = read_corr_file(fn_i['xa'])
     for _ in xrange(num):
@@ -151,7 +153,9 @@ if __name__ == '__main__':
     params = create_params(main_sample['length'])
     idxs = set_idx2(params)
     draw_samples = create_samples(main_sample, idxs)
+    main_sample = []
     BS_samples = create_bootstraps(params, draw_samples)
+    draw_samples = []
     thrds = setup_threads(params, fn_i, fn_o, BS_samples, num=1)
     for thrd in thrds:
         thrd.start()
