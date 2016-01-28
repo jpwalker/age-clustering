@@ -11,7 +11,6 @@ from os.path import join, exists
 from random import randint, seed, sample, choice
 from Correlation_Func import calc_bias_cross, read_corr_file
 from threading import Thread
-from cProfile import run
 
 def create_params(num_halos):
     # Determine number of halos in each subsample used in future bootstrap 
@@ -120,6 +119,7 @@ def thread_func(samples, smp_idx_start, a_halos, xi_m_m, xi_all, of):
     print(smp_idx_start)
     for (t_idx, smp) in enumerate(samples):
         idx = t_idx + smp_idx_start
+        print(idx)
         hf = of['ht'].format(idx)
         crsf = of['xi'].format(idx)
         bf = of['b'].format(idx)
