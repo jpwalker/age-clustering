@@ -11,25 +11,26 @@ from os.path import join, exists
 from random import randint, seed, sample, choice
 from Correlation_Func import calc_bias_cross, read_corr_file
 from threading import Thread
+from cProfile import run
 
-def create_params(num_halos):
+def create_params(nh):
     # Determine number of halos in each subsample used in future bootstrap 
     # samples.
-    if num_halos >= 800:
-        if num_halos % 100 != 0:
-            ns = (num_halos // 100) + 1 # Number of samples
-        else:
-            ns = num_halos // 100 # Number of samples
-        nhs = 100 # Number of halos in samples
-    else:
-        ns = 8 # Number of samples
-        nhs = num_halos // 8 # Number of halos in samples
-    n_resmp = 100 # Number of bootstrap resamples created.
+#     if num_halos >= 1000:
+#         nhs = 100 # Number of halos in samples
+#         if num_halos % nhs != 0:
+#             ns = (num_halos // nhs) + 1 # Number of samples
+#         else:
+#             ns = num_halos // nhs # Number of samples
+#     else:
+    ns = 10 # Number of samples
+    nhs = nh // ns # Number of halos in each sample on average
+    n_resmp = 100 # Number of bootstrap samples created.
     # Determine the seed for the RNG.
     t = times()
     sd = hash(hash(t[0]) + hash(t[4]) + hash(getpid()))
     seed(sd)
-    return {'ns':ns, 'seed':seed, 'nr':n_resmp, 'nh':num_halos, 'nhs':nhs}
+    return {'ns':ns, 'seed':seed, 'nr':n_resmp, 'nh':nh, 'nhs':nhs}
 
 def init_direc():
     hm = environ['HOME']
@@ -80,15 +81,13 @@ def set_idx1(params):
 
 def set_idx2(params):
     nh = params['nh']
-    av_idx = range(nh)
+    av_idx = range(nh) # list of available halo indecies
     idx = []
     nhs = params['nhs']
     for _ in range(params['ns']):
         if nh >= nhs:
             temp = sample(av_idx, nhs)
-            for i in temp:
-                temp_idx = av_idx.index(i)
-                _ = av_idx.pop(temp_idx)
+            _ = [av_idx.pop(av_idx.index(i)) for i in temp]
             idx.append(temp)
         else:
             idx.append(av_idx)
@@ -102,13 +101,14 @@ def create_samples(halos, idxs):
     return samples
 
 def create_bootstraps(params, samples):
-    nbs = params['ns'] * 3 # Number of samples contained in each bootstrap
+    nbs = params['ns'] * 3 # Number of halos contained in each bootstrap
                             # resample is 3 times the original sample.
     BS_samples = []
     for _ in xrange(params['nr']):
         BS_samples.append(create_halo_table())
         for _ in xrange(nbs):
             halo_table_extend(BS_samples[-1], choice(samples))
+        print(BS_samples[-1]['length'])
     return BS_samples
 
 def thread_func(samples, smp_idx_start, a_halos, xi_m_m, xi_all, of):
@@ -116,22 +116,22 @@ def thread_func(samples, smp_idx_start, a_halos, xi_m_m, xi_all, of):
     #a_halos is a halo table with all halos used in the cross-correlation.
     #xi_all, xi_m_m holds the autocorrelation function of all halos and matter.
     #of is the output file.
-    print(smp_idx_start)
     for (t_idx, smp) in enumerate(samples):
         idx = t_idx + smp_idx_start
         print(idx)
         hf = of['ht'].format(idx)
         crsf = of['xi'].format(idx)
         bf = of['b'].format(idx)
-        _ = calc_bias_cross(smp, a_halos, xi_m_m, halo_file1 = hf, 
-                            cross_filename = crsf, bias_filename = bf, 
-                            xi_auto_halos = xi_all, MS2 = True)
+        run("_ = calc_bias_cross(smp, a_halos, xi_m_m, halo_file1 = hf, \
+                            cross_filename = crsf, bias_filename = bf, \
+                            xi_auto_halos = xi_all, MS2 = True)")
 
 def setup_threads(params, fn_i, fn_o, samples, num=1):
-    ns = params['ns']
+    nr = params['nr']
     thrds = []
     sample_start = 0
-    sample_end = ns // num + 1
+    delta = nr // num + 1
+    sample_end = delta
     fmt = 'x,x,x,x,x,x,x,7,8,9,x,x,x,x,x,x,x,17,x,x,x'
     all_ht = read_halo_table_ascii(fn_i['a_ht'], fmt, skip = 1)
     xi_m_m = read_corr_file(fn_i['xm'])
@@ -141,9 +141,9 @@ def setup_threads(params, fn_i, fn_o, samples, num=1):
                xi_m_m, xi_all, fn_o)
         thrds.append(Thread(target=thread_func, args=arg))
         sample_start = sample_end + 1
-        sample_end += ns // num + 1
-        if sample_end > ns - 1:
-            sample_end = ns - 1
+        sample_end += delta
+        if sample_end > nr - 1:
+            sample_end = nr - 1
     return thrds
         
 if __name__ == '__main__':
@@ -156,6 +156,7 @@ if __name__ == '__main__':
     main_sample = []
     BS_samples = create_bootstraps(params, draw_samples)
     draw_samples = []
+    print(len(BS_samples))
     thrds = setup_threads(params, fn_i, fn_o, BS_samples, num=1)
     for thrd in thrds:
         thrd.start()
