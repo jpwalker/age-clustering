@@ -12,7 +12,7 @@ from os.path import join, exists
 from random import randint, seed, sample, choice
 from Correlation_Func import calc_bias_cross, read_corr_file
 from threading import Thread
-from cProfile import run
+from cProfile import runctx
 
 def create_params(nh):
     # Determine number of halos in each subsample used in future bootstrap 
@@ -36,7 +36,7 @@ def create_params(nh):
 def init_direc():
     hm = environ['HOME']
     snap = 67
-    i = 0
+    i = 7
     j = 1
     snap_suffix = '-1'
     xi_m_m_fn = 'xi_m_m.txt'
@@ -109,7 +109,6 @@ def create_bootstraps(params, samples):
         BS_samples.append(create_halo_table())
         for _ in xrange(nbs):
             halo_table_extend(BS_samples[-1], choice(samples))
-        print(BS_samples[-1]['length'])
     return BS_samples
 
 def thread_func(samples, smp_idx_start, a_halos, xi_m_m, xi_all, of):
@@ -120,12 +119,16 @@ def thread_func(samples, smp_idx_start, a_halos, xi_m_m, xi_all, of):
     for (t_idx, smp) in enumerate(samples):
         idx = t_idx + smp_idx_start
         print(idx)
+        print(smp['length'])
         hf = of['ht'].format(idx)
         crsf = of['xi'].format(idx)
         bf = of['b'].format(idx)
-        run("_ = calc_bias_cross(smp, a_halos, xi_m_m, halo_file1 = hf, \
+        runctx("_ = calc_bias_cross(smp, a_halos, xi_m_m, halo_file1 = hf, \
                             cross_filename = crsf, bias_filename = bf, \
-                            xi_auto_halos = xi_all, MS2 = True)")
+                            xi_auto_halos = xi_all, MS2 = True)", None, \
+                            {'smp':smp,'a_halos':a_halos, 'hf':hf, 'crsf':crsf, \
+                             'bf':bf, 'xi_all':xi_all, 'xi_m_m':xi_m_m, \
+                             'calc_bias_cross':calc_bias_cross})
 
 def setup_threads(params, fn_i, fn_o, samples, num=1):
     nr = params['nr']
@@ -157,7 +160,6 @@ if __name__ == '__main__':
     main_sample = []
     BS_samples = create_bootstraps(params, draw_samples)
     draw_samples = []
-    print(len(BS_samples))
     thrds = setup_threads(params, fn_i, fn_o, BS_samples, num=1)
     for thrd in thrds:
         thrd.start()
